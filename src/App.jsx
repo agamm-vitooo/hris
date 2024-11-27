@@ -71,7 +71,7 @@ const AppContent = () => {
           }
         />
         <Route
-          path="/EmployeePages/:userID"
+          path="/EmployeePages"
           element={
             <ProtectedRoute>
               <EmployeePages />

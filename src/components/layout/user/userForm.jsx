@@ -38,6 +38,22 @@ const UserForm = ({
           placeholder="Email"
           className="border rounded p-2 text-primary bg-gray-100"
         />
+        <input
+          type="phone"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Phone"
+          className="border rounded p-2 text-primary bg-gray-100"
+        />
+        <input
+          type="date"
+          name="hireDate"
+          value={formData.hireDate}
+          onChange={handleChange}
+          placeholder="Hire Date"
+          className="border rounded p-2 text-primary bg-gray-100"
+        />
         <select
           name="role"
           value={formData.role}
@@ -49,7 +65,6 @@ const UserForm = ({
           <option value="User">User</option>
           <option value="Manager">Manager</option>
         </select>
-        {/* Other fields */}
         {/* Department & Position */}
         <select
           name="department"

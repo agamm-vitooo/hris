@@ -7,7 +7,7 @@ const UserTable = ({ users, handleEdit, handleDelete }) => {
       <table className="w-full bg-gray-100 text-primary shadow-md rounded-lg">
         <thead className="bg-gray-200">
           <tr>
-            <th className="p-4 text-left">UserID</th>
+            <th className="p-4 text-left">ID</th>
             <th className="p-4 text-left">Name</th>
             <th className="p-4 text-left">Email</th>
             <th className="p-4 text-left">Role</th>
@@ -44,7 +44,7 @@ const UserTable = ({ users, handleEdit, handleDelete }) => {
                     Delete
                   </button>
                   <Link
-                    to={`/Employee/${user.userID}`}
+                    to={`/Employee/${user.employeeID}`}
                     className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                   >
                     View Employee
