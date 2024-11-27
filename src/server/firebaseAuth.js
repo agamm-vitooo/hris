@@ -30,7 +30,7 @@ const checkIdleTime = () => {
             .then(() => {
                 console.log("User logged out due to inactivity.");
                 localStorage.removeItem("authUser"); // Hapus data login
-                window.location.href = "/Login"; // Redirect ke halaman login
+                window.location.href = "/"; // Redirect ke halaman login
             })
             .catch((error) => {
                 console.error("Error logging out:", error);

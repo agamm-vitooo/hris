@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../sidebar/sidebar";
+import logo from "../../assets/icon.png"; 
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -32,11 +33,17 @@ const Navbar = () => {
             </svg>
           </button>
 
-          {/* HRIS Logo on the Left */}
+          {/* Logo and HRIS Text */}
           <Link
             to="/home"
-            className="navLogo text-black font-semibold text-xl"
+            className="navLogo flex items-center text-black font-semibold text-xl"
           >
+            {/* Logo Image */}
+            <img
+              src={logo} // Menggunakan logo dari import
+              alt="HRIS Logo"
+              className="w-6 h-6 mr-2" // Atur ukuran logo
+            />
             HRIS
           </Link>
         </div>

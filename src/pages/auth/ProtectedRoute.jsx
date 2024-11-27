@@ -5,7 +5,7 @@ import { auth } from '../../server/firebase'; // Import auth instance
 const ProtectedRoute = ({ children }) => {
     const user = auth.currentUser; // Periksa apakah ada pengguna yang login
 
-    return user ? children : <Navigate to="/Login" />;
+    return user ? children : <Navigate to="/" />;
 };
 
 export default ProtectedRoute;

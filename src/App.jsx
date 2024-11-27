@@ -3,16 +3,14 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from "react-route
 import Login from "./pages/auth/LoginPages";
 import Navbar from "./components/navbar/Navbar";
 import Home from "./pages/homePages";
-import Register from "./pages/auth/RegisterPages";
 import LogOut from "./components/LogOutButton";
 import ProtectedRoute from "./pages/auth/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import PhoneAuth from "./pages/auth/PhoneAuth";
 import UserPages from "./pages/UserPages/userPages";
 import UserDetail from "./components/layout/UserDetails";
 import AboutPage from "./pages/aboutPages";
-import EmployeePages from "./pages/employeePages";
+import AccountPages from "./pages/account/accountPages"
 
 // Impor firebaseAuth untuk memulai auto logout dan memantau status login
 import './server/firebaseAuth'; 
@@ -27,16 +25,14 @@ function App() {
 
 const AppContent = () => {
   const location = useLocation();
-  const hideNavbarRoutes = ["/Login", "/", "/PhoneAuth"];
+  const hideNavbarRoutes = ["/"];
 
   return (
     <>
       {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
       <ToastContainer />
       <Routes>
-        <Route path="/" element={<Register />} />
-        <Route path="/Login" element={<Login />} />
-        <Route path="/PhoneAuth" element={<PhoneAuth />} />
+        <Route path="/" element={<Login />} />
         <Route path="/LogOut" element={<LogOut />} />
         <Route
           path="/Home"
@@ -71,10 +67,10 @@ const AppContent = () => {
           }
         />
         <Route
-          path="/EmployeePages"
+          path="/AccountPages"
           element={
             <ProtectedRoute>
-              <EmployeePages />
+              <AccountPages/>
             </ProtectedRoute>
           }
         />

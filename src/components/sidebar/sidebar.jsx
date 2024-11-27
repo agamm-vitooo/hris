@@ -11,7 +11,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     try {
       await logOut();
       toast.success("Logged out successfully!");
-      navigate("/Login");
+      navigate("/");
     } catch (error) {
       toast.error("Failed to log out: " + error.message);
     }
@@ -49,12 +49,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             Users
           </Link>
           <Link
-            to="/EmployeePages"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
-          >
-            Employees
-          </Link>
-          <Link
             to="/attendance"
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
           >
@@ -77,6 +71,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
           >
             Tasks
+          </Link>
+          <Link
+            to="/accountPages"
+            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+          >
+            Account
           </Link>
         </nav>
         {/* Centered Logout Button */}

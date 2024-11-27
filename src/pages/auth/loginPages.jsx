@@ -60,34 +60,6 @@ const Login = () => {
                         Login
                     </button>
                 </form>
-
-                <div className="flex justify-center space-x-4 mt-6">
-                    {/* Google Login */}
-                    <button
-                        onClick={handleGoogleLogin}
-                        className="bg-gray-100 p-3 rounded-full hover:bg-gray-200 transition duration-200"
-                    >
-                        <FcGoogle size={28} />
-                    </button>
-
-                    {/* Phone Login */}
-                    <button
-                        onClick={() => navigate('/PhoneAuth')}
-                        className="bg-gray-100 p-3 rounded-full hover:bg-gray-200 transition duration-200"
-                    >
-                        <BsPhone size={28} className="text-yellow-500" />
-                    </button>
-                </div>
-
-                <p className="text-center text-gray-600 mt-4">
-                    Don't have an account?{' '}
-                    <span
-                        onClick={() => navigate('/')}
-                        className="text-green-500 hover:underline cursor-pointer"
-                    >
-                        Register
-                    </span>
-                </p>
             </div>
         </div>
     );

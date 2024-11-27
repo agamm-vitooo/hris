@@ -6,7 +6,6 @@ import UserChart from './UserPages/userChart';
 const HomePages = () => {
   const [users, setUsers] = useState([]);
 
-  // Fetch data from Firestore
   const fetchUsers = async () => {
     try {
       const userCollection = collection(db, 'users');
@@ -30,7 +29,6 @@ const HomePages = () => {
       <h1 className="text-2xl font-bold">Welcome to HRIS Dashboard</h1>
       <p>Here are the statistics from the user data.</p>
       <div className="mt-6">
-        {/* Pass users data to UserChart */}
         <UserChart users={users} />
       </div>
     </div>

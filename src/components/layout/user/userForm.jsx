@@ -46,6 +46,14 @@ const UserForm = ({
           placeholder="Phone"
           className="border rounded p-2 text-primary bg-gray-100"
         />
+          <input
+    type="text"
+    name="address"
+    value={formData.address}
+    onChange={handleChange}
+    placeholder="Address"
+    className="border rounded p-2 text-primary bg-gray-100"
+  />
         <input
           type="date"
           name="hireDate"
@@ -79,6 +87,40 @@ const UserForm = ({
             </option>
           ))}
         </select>
+        <input
+    type="text"
+    name="emergencyContact"
+    value={formData.emergencyContact}
+    onChange={handleChange}
+    placeholder="Emergency Contact"
+    className="border rounded p-2 text-primary bg-gray-100"
+  />
+        <input
+    type="number"
+    name="salary"
+    value={formData.salary}
+    onChange={handleChange}
+    placeholder="Salary"
+    className="border rounded p-2 text-primary bg-gray-100"
+  />
+        <input
+    type="text"
+    name="bankAccount"
+    value={formData.bankAccount}
+    onChange={handleChange}
+    placeholder="Bank Account"
+    className="border rounded p-2 text-primary bg-gray-100"
+  />
+        <select
+    name="status"
+    value={formData.status}
+    onChange={handleChange}
+    className="border rounded p-2 text-primary bg-gray-100"
+  >
+    <option value="Active">Active</option>
+    <option value="Inactive">Inactive</option>
+    <option value="On Leave">On Leave</option>
+  </select>
         <select
           name="position"
           value={formData.position}

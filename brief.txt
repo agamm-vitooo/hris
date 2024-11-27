@@ -1,0 +1,115 @@
+### 1. **Koleksi: `users`**
+Menyimpan semua informasi pengguna, baik admin maupun pegawai.
+
+#### Struktur Dokumen:
+```json
+{
+  "userID": "uid_12345",  // ID pengguna unik dari Firebase Authentication
+  "role": "admin",        // admin, employee
+  "name": "John Doe",     // Nama pengguna
+  "email": "john@example.com",  // Email pengguna
+  "phone": "+1234567890",  // Nomor telepon (opsional)
+  "hireDate": "2023-01-01T00:00:00Z",  // Tanggal bergabung
+  "department": "HR",  // Departemen (opsional)
+  "position": "Manager",  // Posisi (opsional)
+  "address": "123 Main St",  // Alamat (opsional)
+  "birthDate": "1990-12-01T00:00:00Z",  // Tanggal lahir (opsional)
+  "emergencyContact": "+0987654321",  // Kontak darurat (opsional)
+  "salary": 5000,  // Gaji (opsional)
+  "bankAccount": "123456789",  // Nomor rekening bank (opsional)
+  "status": "active",  // Status pegawai: active, inactive, on-leave
+  "managerID": "uid_67890",  // ID manager (jika ada)
+  "profilePicture": "https://example.com/pic.jpg"  // URL gambar profil (opsional)
+}
+```
+
+---
+
+### 2. **Koleksi: `attendance`**
+Menyimpan data kehadiran dan absensi pengguna.
+
+#### Struktur Dokumen:
+```json
+{
+  "attendanceID": "attendance_001",  // ID unik untuk tiap kehadiran
+  "userID": "uid_12345",  // ID pengguna yang hadir
+  "date": "2023-11-01T00:00:00Z",  // Tanggal absensi
+  "status": "present",  // Status absensi: present, absent, sick, vacation
+  "checkInTime": "2023-11-01T09:00:00Z",  // Waktu check-in
+  "checkOutTime": "2023-11-01T17:00:00Z",  // Waktu check-out
+  "remarks": "On time"  // Keterangan (opsional)
+}
+```
+
+---
+
+### 3. **Koleksi: `payrolls`**
+Menyimpan informasi terkait pembayaran gaji pengguna.
+
+#### Struktur Dokumen:
+```json
+{
+  "payrollID": "payroll_001",  // ID unik untuk tiap transaksi gaji
+  "userID": "uid_12345",  // ID pengguna
+  "month": "January 2024",  // Bulan gaji
+  "basicSalary": 5000,  // Gaji pokok
+  "bonus": 500,  // Bonus (opsional)
+  "deductions": 100,  // Potongan (opsional)
+  "totalSalary": 5400,  // Gaji total setelah potongan
+  "paymentDate": "2024-01-15T00:00:00Z",  // Tanggal pembayaran
+  "status": "paid"  // Status pembayaran: paid, pending
+}
+```
+
+---
+
+### 4. **Koleksi: `leaveRequests`**
+Menyimpan data permintaan cuti dan izin pengguna.
+
+#### Struktur Dokumen:
+```json
+{
+  "leaveRequestID": "leave_001",  // ID unik untuk permintaan cuti
+  "userID": "uid_12345",  // ID pengguna yang mengajukan cuti
+  "startDate": "2023-12-01T00:00:00Z",  // Tanggal mulai cuti
+  "endDate": "2023-12-05T00:00:00Z",  // Tanggal selesai cuti
+  "leaveType": "vacation",  // Jenis cuti: sick, vacation, emergency
+  "status": "approved",  // Status cuti: approved, pending, rejected
+  "approvalDate": "2023-11-20T00:00:00Z",  // Tanggal persetujuan (opsional)
+  "remarks": "Annual leave"  // Keterangan (opsional)
+}
+```
+
+---
+
+### 5. **Koleksi: `tasks`**
+Menyimpan informasi tugas yang diberikan kepada pengguna.
+
+#### Struktur Dokumen:
+```json
+{
+  "taskID": "task_001",  // ID unik untuk tiap tugas
+  "taskName": "Complete Report",  // Nama tugas
+  "assignedTo": "uid_12345",  // ID pengguna yang diberi tugas
+  "description": "Prepare the monthly report",  // Deskripsi tugas
+  "dueDate": "2023-11-30T00:00:00Z",  // Tanggal batas tugas
+  "status": "in-progress",  // Status tugas: in-progress, completed, pending
+  "priority": "high",  // Prioritas: high, medium, low
+  "createdAt": "2023-11-01T00:00:00Z",  // Tanggal dibuat
+  "updatedAt": "2023-11-15T00:00:00Z"  // Tanggal diperbarui
+}
+```
+
+---
+
+### **Relasi Antar Koleksi**
+1. **`users` sebagai pusat data utama**:
+   - Setiap koleksi lain (`attendance`, `payrolls`, `leaveRequests`, `tasks`) memiliki referensi ke `userID` dari `users`.
+   - Tidak perlu koleksi tambahan seperti `employees`, karena semua data pegawai disimpan di `users`.
+
+2. **Penyederhanaan relasi**:
+   - Tidak ada redundansi data. Semua informasi terhubung langsung ke `userID`.
+
+---
+
+Struktur ini lebih ringkas dan mudah dikelola. Semua data pengguna, baik admin maupun pegawai, terpusat di koleksi `users`.

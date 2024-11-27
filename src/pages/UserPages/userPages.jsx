@@ -17,7 +17,12 @@ const UserPages = () => {
     department: "",
     position: "",
     profilePicture: "",
-  };
+    address: "",
+    emergencyContact: "",
+    salary: "",
+    bankAccount: "",
+    status: "Active", // Default status
+  };  
 
   const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
@@ -88,7 +93,7 @@ const UserPages = () => {
       }
     }
     return true;
-  };
+  };  
 
   // Handle form submission for adding or editing a user
   const handleSubmit = async (e) => {
