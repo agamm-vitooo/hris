@@ -1,7 +1,8 @@
+// src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier } from "firebase/auth";
-import { getAnalytics } from "firebase/analytics";
-import { getFirestore } from "firebase/firestore"; // Tambahkan import Firestore
+import { getFirestore } from "firebase/firestore"; // Mengimpor Firestore
+import { getAnalytics } from "firebase/analytics"; // Mengimpor Analytics
 
 // Konfigurasi Firebase menggunakan variabel lingkungan
 const firebaseConfig = {
@@ -21,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
 // Inisialisasi Firestore
-const db = getFirestore(app); // Tambahkan inisialisasi Firestore
+const db = getFirestore(app); // Inisialisasi Firestore
 
 // Inisialisasi Firebase Analytics jika measurementId tersedia
 let analytics;
@@ -48,4 +49,4 @@ const setUpRecaptcha = () => {
 };
 
 // Ekspor modul Firebase dan fungsi helper
-export { app, auth, db, analytics, setUpRecaptcha }; // Tambahkan ekspor db
+export { app, auth, db, analytics, setUpRecaptcha };
