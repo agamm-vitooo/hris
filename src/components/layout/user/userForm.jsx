@@ -1,155 +1,118 @@
 import React from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const UserForm = ({
   formData,
-  handleChange,
+  handleUserChange,
   handleSubmit,
   handleFileChange,
   isEditing,
+  togglePasswordVisibility,
+  passwordVisible,
   departmentPositions,
 }) => {
-  const availablePositions = formData.department
-    ? departmentPositions[formData.department]
-    : [];
-
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6 sm:mb-8"
-    >
-      <h2 className="text-lg sm:text-2xl font-medium text-gray-700 mb-4">
-        {isEditing ? "Edit User" : "Add New User"}
+    <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
+      <h2 className="text-lg sm:text-xl font-medium text-gray-700 mb-4">
+        {isEditing ? "Edit User" : "Add User"}
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {/* Input fields */}
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Name"
-          className="border rounded p-2 text-primary bg-gray-100"
-        />
-        <input
-          type="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder="Email"
-          className="border rounded p-2 text-primary bg-gray-100"
-        />
-        <input
-          type="phone"
-          name="phone"
-          value={formData.phone}
-          onChange={handleChange}
-          placeholder="Phone"
-          className="border rounded p-2 text-primary bg-gray-100"
-        />
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
-    type="text"
-    name="address"
-    value={formData.address}
-    onChange={handleChange}
-    placeholder="Address"
-    className="border rounded p-2 text-primary bg-gray-100"
-  />
-        <input
-          type="date"
-          name="hireDate"
-          value={formData.hireDate}
-          onChange={handleChange}
-          placeholder="Hire Date"
-          className="border rounded p-2 text-primary bg-gray-100"
-        />
-        <select
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          className="border rounded p-2 text-primary bg-gray-100"
-        >
-          <option value="">Select Role</option>
-          <option value="Admin">Admin</option>
-          <option value="User">User</option>
-          <option value="Manager">Manager</option>
-        </select>
-        {/* Department & Position */}
-        <select
-          name="department"
-          value={formData.department}
-          onChange={handleChange}
-          className="border rounded p-2 text-primary bg-gray-100"
-        >
-          <option value="">Select Department</option>
-          {Object.keys(departmentPositions).map((dept) => (
-            <option key={dept} value={dept}>
-              {dept}
-            </option>
-          ))}
-        </select>
-        <input
-    type="text"
-    name="emergencyContact"
-    value={formData.emergencyContact}
-    onChange={handleChange}
-    placeholder="Emergency Contact"
-    className="border rounded p-2 text-primary bg-gray-100"
-  />
-        <input
-    type="number"
-    name="salary"
-    value={formData.salary}
-    onChange={handleChange}
-    placeholder="Salary"
-    className="border rounded p-2 text-primary bg-gray-100"
-  />
-        <input
-    type="text"
-    name="bankAccount"
-    value={formData.bankAccount}
-    onChange={handleChange}
-    placeholder="Bank Account"
-    className="border rounded p-2 text-primary bg-gray-100"
-  />
-        <select
-    name="status"
-    value={formData.status}
-    onChange={handleChange}
-    className="border rounded p-2 text-primary bg-gray-100"
-  >
-    <option value="Active">Active</option>
-    <option value="Inactive">Inactive</option>
-    <option value="On Leave">On Leave</option>
-  </select>
-        <select
-          name="position"
-          value={formData.position}
-          onChange={handleChange}
-          className="border rounded p-2 text-primary bg-gray-100"
-          disabled={!formData.department}
-        >
-          <option value="">Select Position</option>
-          {availablePositions.map((position) => (
-            <option key={position} value={position}>
-              {position}
-            </option>
-          ))}
-        </select>
-        {/* File Upload */}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="border rounded p-2 text-primary bg-gray-100"
-        />
-      </div>
-      <button
-        type="submit"
-        className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 w-full sm:w-auto"
-      >
-        {isEditing ? "Update User" : "Add User"}
-      </button>
-    </form>
+            type="text"
+            name="name"
+            value={formData.name}
+            onChange={handleUserChange}
+            placeholder="Name"
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleUserChange}
+            placeholder="Email"
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+            required
+          />
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleUserChange}
+            className="border rounded p-2 text-gray-700 bg-gray-100"
+          >
+            <option value="">Select Role</option>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+            <option value="Manager">Manager</option>
+          </select>
+          <input
+            type={passwordVisible ? "text" : "password"}
+            name="password"
+            value={formData.password}
+            onChange={handleUserChange}
+            placeholder="Password"
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+            required
+          />
+          <span onClick={togglePasswordVisibility}>
+            {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+          </span>
+          <input
+            type="text"
+            name="phone"
+            value={formData.phone}
+            onChange={handleUserChange}
+            placeholder="Phone"
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+          />
+          <input
+            type="date"
+            name="hireDate"
+            value={formData.hireDate}
+            onChange={handleUserChange}
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+          />
+          <select
+            name="department"
+            value={formData.department}
+            onChange={handleUserChange}
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+          >
+            <option value="">Select Department</option>
+            {Object.keys(departmentPositions).map((dept) => (
+              <option key={dept} value={dept}>
+                {dept}
+              </option>
+            ))}
+          </select>
+          <select
+            name="position"
+            value={formData.position}
+            onChange={handleUserChange}
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+            disabled={!formData.department}
+          >
+            <option value="">Select Position</option>
+            {(departmentPositions[formData.department] || []).map((position) => (
+              <option key={position} value={position}>
+                {position}
+              </option>
+            ))}
+          </select>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="mb-4 text-gray-700 bg-gray-100"
+          />
+        </div>
+        <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">
+          {isEditing ? "Update User & Account" : "Add User & Account"}
+        </button>
+      </form>
+    </div>
   );
 };
 
