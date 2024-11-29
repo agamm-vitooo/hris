@@ -1,22 +1,28 @@
-import React from "react";
+import React, { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
-const UserForm = ({
-  formData,
-  handleUserChange,
-  handleSubmit,
-  handleFileChange,
-  isEditing,
-  togglePasswordVisibility,
-  passwordVisible,
-  departmentPositions,
-}) => {
+const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departmentPositions, loading }) => {
+  const [passwordVisible, setPasswordVisible] = useState(false);
+
+  const handleUserChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+      ...(name === "department" && { position: "" }),
+    }));
+  };
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
+
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
       <h2 className="text-lg sm:text-xl font-medium text-gray-700 mb-4">
         {isEditing ? "Edit User" : "Add User"}
       </h2>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={(e) => { e.preventDefault(); handleUserSubmit(formData, isEditing, formData.userID); }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <input
             type="text"
@@ -36,17 +42,6 @@ const UserForm = ({
             className="p-2 w-full border rounded text-gray-700 bg-gray-100"
             required
           />
-          <select
-            name="role"
-            value={formData.role}
-            onChange={handleUserChange}
-            className="border rounded p-2 text-gray-700 bg-gray-100"
-          >
-            <option value="">Select Role</option>
-            <option value="Admin">Admin</option>
-            <option value="User">User</option>
-            <option value="Manager">Manager</option>
-          </select>
           <input
             type={passwordVisible ? "text" : "password"}
             name="password"
@@ -59,6 +54,50 @@ const UserForm = ({
           <span onClick={togglePasswordVisibility}>
             {passwordVisible ? <FaEyeSlash /> : <FaEye />}
           </span>
+
+          <input
+            type="text"
+            name="address"
+            value={formData.address}
+            onChange={handleUserChange}
+            placeholder="Address"
+            className="border rounded p-2 text-primary bg-gray-100"
+          />
+          <input
+            type="text"
+            name="emergencyContact"
+            value={formData.emergencyContact}
+            onChange={handleUserChange}
+            placeholder="Emergency Contact"
+            className="border rounded p-2 text-primary bg-gray-100"
+          />
+          <input
+            type="number"
+            name="salary"
+            value={formData.salary}
+            onChange={handleUserChange}
+            placeholder="Salary"
+            className="border rounded p-2 text-primary bg-gray-100"
+          />
+          <input
+            type="text"
+            name="bankAccount"
+            value={formData.bankAccount}
+            onChange={handleUserChange}
+            placeholder="Bank Account"
+            className="border rounded p-2 text-primary bg-gray-100"
+          />
+          <select
+            name="status"
+            value={formData.status}
+            onChange={handleUserChange}
+            className="border rounded p-2 text-primary bg-gray-100"
+          >
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+            <option value="On Leave">On Leave</option>
+          </select>
+
           <input
             type="text"
             name="phone"
@@ -72,6 +111,7 @@ const UserForm = ({
             name="hireDate"
             value={formData.hireDate}
             onChange={handleUserChange}
+            placeholder="Hire Date"
             className="p-2 w-full border rounded text-gray-700 bg-gray-100"
           />
           <select
@@ -101,12 +141,8 @@ const UserForm = ({
               </option>
             ))}
           </select>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="mb-4 text-gray-700 bg-gray-100"
-          />
+
+          <input type="file" accept="image/*" className="mb-4 text-gray-700 bg-gray-100" />
         </div>
         <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">
           {isEditing ? "Update User & Account" : "Add User & Account"}

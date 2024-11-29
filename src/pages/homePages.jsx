@@ -19,8 +19,7 @@ const HomePages = () => {
       }));
       setUsers(userList);
 
-      // Simulasi pengguna yang login (ubah ini sesuai dengan login sistem Anda)
-      const loggedInUser = userList[0]; // Ambil user pertama untuk simulasi
+      const loggedInUser = userList[0];
       setCurrentUser(loggedInUser);
     } catch (error) {
       console.error('Error fetching users:', error);

@@ -49,7 +49,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             Users
           </Link>
           <Link
-            to="/attendance"
+            to="/AttendanceAdmin"
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
           >
             Attendance

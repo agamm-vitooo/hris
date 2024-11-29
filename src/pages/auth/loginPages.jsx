@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { FcGoogle } from 'react-icons/fc'; // Google Icon
-import { BsPhone } from 'react-icons/bs'; // Phone Icon
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -16,18 +14,6 @@ const Login = () => {
         try {
             await signInWithEmailAndPassword(auth, email, password);
             toast.success("Logged in successfully!");
-            navigate('/Home');
-        } catch (error) {
-            toast.error(error.message);
-        }
-    };
-
-    const handleGoogleLogin = async () => {
-        const provider = new GoogleAuthProvider();
-        try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            toast.success(`Welcome, ${user.displayName}!`);
             navigate('/Home');
         } catch (error) {
             toast.error(error.message);

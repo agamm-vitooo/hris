@@ -1,11 +1,11 @@
 import React from "react";
 
-const UserTable = ({ filteredUsers, handleEdit, handleDelete }) => {
+const UserTables = ({ users, handleDelete, handleEdit }) => {
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md">
       <h2 className="text-lg sm:text-xl font-medium text-gray-700 mb-4">Users List</h2>
       <ul>
-        {filteredUsers.map((user) => (
+        {users.map((user) => (
           <li key={user.id} className="flex justify-between items-center py-2 text-gray-800">
             <div>
               <span className="font-bold">{user.name}</span> - {user.position}
@@ -31,4 +31,4 @@ const UserTable = ({ filteredUsers, handleEdit, handleDelete }) => {
   );
 };
 
-export default UserTable;
+export default UserTables;
