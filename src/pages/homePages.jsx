@@ -6,9 +6,8 @@ import heroImage from "../assets/hero.png";
 
 const HomePages = () => {
   const [users, setUsers] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null); // Simulasi pengguna yang login
-
-  // Fetch users from Firestore
+  const [currentUser, setCurrentUser] = useState(null); 
+  
   const fetchUsers = async () => {
     try {
       const userCollection = collection(db, 'users');
