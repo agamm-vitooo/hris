@@ -7,13 +7,13 @@ const UserTables = ({ users, handleDelete, handleEdit }) => {
       <ul>
         {users.map((user) => (
           <li key={user.id} className="flex justify-between items-center py-2 text-gray-800">
-            <div>
+            <div className="flex-1">
               <span className="font-bold">{user.name}</span> - {user.position}
             </div>
-            <div>
+            <div className="flex space-x-2">
               <button
                 onClick={() => handleEdit(user)}
-                className="bg-blue-500 text-white py-1 px-3 rounded mr-2"
+                className="bg-blue-500 text-white py-1 px-3 rounded"
               >
                 Edit
               </button>

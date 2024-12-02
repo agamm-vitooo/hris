@@ -1,25 +1,68 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { logOut } from "../../server/firebaseAuth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { getAuth } from "firebase/auth";
+import { db } from "../../server/firebase";
+import { collection, getDocs } from "firebase/firestore";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
+  const [role, setRole] = useState(null);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const auth = getAuth();
+
+  // Mengambil role pengguna dari Firestore
+  const fetchUserRole = async (userId) => {
+    try {
+      console.log("Fetching user role for userId:", userId);  // Verifikasi userId yang diterima
+      const userRef = collection(db, "users");
+      const snapshot = await getDocs(userRef);
+      const userDoc = snapshot.docs.find(doc => doc.id === userId);
+
+      if (userDoc) {
+        // Jika ditemukan, set role
+        setRole(userDoc.data().role);
+        console.log("Fetched Role:", userDoc.data().role);  // Verifikasi role yang diambil
+      } else {
+        console.log("User not found in Firestore"); // Log jika user tidak ditemukan
+      }
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+    } finally {
+      setLoading(false);  // Selesai mengambil data
+    }
+  };
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      console.log("Authenticated user:", user);  // Verifikasi user yang sedang login
+      fetchUserRole(user.uid);  // Ambil role berdasarkan uid
+    } else {
+      console.log("No authenticated user found");
+    }
+  }, [auth]);
+
+  useEffect(() => {
+    console.log("User Role:", role);  // Verifikasi nilai role yang disimpan di state
+  }, [role]);
 
   const handleLogout = async () => {
     try {
       await logOut();
       toast.success("Logged out successfully!");
-      navigate("/");
+      navigate("/"); // Redirect to homepage after logout
     } catch (error) {
       toast.error("Failed to log out: " + error.message);
     }
   };
 
+  if (loading) return <div>Loading...</div>; // Menampilkan loading jika data masih diambil
+
   return (
     <>
-      {/* Overlay to close sidebar on outside click */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black bg-opacity-50 z-40"
@@ -42,14 +85,26 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </button>
         </div>
         <nav className="mt-4">
+          {/* Hanya tampilkan link untuk Admin jika role = 'Admin' */}
+          {role === "Admin" && (
+            <Link
+              to="/UserPages"
+              className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+            >
+              Admin Users
+            </Link>
+          )}
+          {/* Hanya tampilkan link untuk User jika role = 'User' */}
+          {role === "User" && (
+            <Link
+              to="/ProfilePage"
+              className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+            >
+              Client Users
+            </Link>
+          )}
           <Link
-            to="/UserPages"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
-          >
-            Users
-          </Link>
-          <Link
-            to="/AttendanceAdmin"
+            to="/attendance"
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
           >
             Attendance
@@ -73,13 +128,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             Tasks
           </Link>
           <Link
-            to="/accountPages"
+            to="/account"
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
           >
             Account
           </Link>
         </nav>
-        {/* Centered Logout Button */}
+        {/* Tombol Logout */}
         <div className="mt-8 flex justify-center">
           <button
             onClick={handleLogout}

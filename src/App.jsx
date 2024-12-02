@@ -11,12 +11,12 @@ import UserPages from "./pages/UserPages/userPages";
 import UserDetail from "./components/layout/UserDetails";
 import AboutPage from "./pages/aboutPages";
 import AccountPages from "./pages/account/accountPages";
-import ClientPage from "../client/pages/attendance/attendance"; // Halaman Client
-import AdminPage from "./pages/attendance/attendancePages"; // Halaman Admin
-import ProfilePage from "../client/pages/users/ProfilePage"; // Halaman Profil Pengguna
-import './server/firebaseAuth'; 
-import AttendanceAdmin from "./pages/attendance/attendancePages";
-import AttendanceClient from "../client/pages/attendance/attendance";
+import AttendanceClient from "../client/pages/attendance/attendance"; // Halaman Client
+import AttendanceAdmin from "./pages/attendance/attendancePages"; // Halaman Admin
+import Dashboard from "../client/pages/dashboard";
+
+//Client
+import ProfilePage from "../client/pages/users/ProfilePage";
 
 function App() {
   return (
@@ -28,26 +28,32 @@ function App() {
 
 const AppContent = () => {
   const location = useLocation();
-  const hideNavbarRoutes = ["/"]; // Navbar tidak ditampilkan di halaman login
+  const hideNavbarRoutes = ["/"]; // Halaman yang tidak membutuhkan Navbar
 
   return (
     <>
-      {/* Tampilkan Navbar jika bukan halaman login */}
+      {/* Navbar akan disembunyikan pada halaman login */}
       {!hideNavbarRoutes.includes(location.pathname) && <Navbar />}
       <ToastContainer />
       <Routes>
         {/* Halaman Login */}
         <Route path="/" element={<Login />} />
-        
-        {/* Logout */}
         <Route path="/LogOut" element={<LogOut />} />
-        
-        {/* Halaman yang memerlukan proteksi login */}
+
+        {/* Rute dengan proteksi */}
         <Route
           path="/Home"
           element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
             </ProtectedRoute>
           }
         />
@@ -106,7 +112,7 @@ const AppContent = () => {
 
         {/* Halaman Profil Pengguna */}
         <Route
-          path="/Profile"
+          path="/ProfilePage"
           element={
             <ProtectedRoute>
               <ProfilePage />
