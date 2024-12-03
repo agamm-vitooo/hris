@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaEye, FaEyeSlash, FaTimes } from "react-icons/fa";
 
-const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departmentPositions, loading }) => {
+const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departmentPositions, loading, onCancel }) => {
   const [passwordVisible, setPasswordVisible] = useState(false);
 
   const handleUserChange = (e) => {
@@ -24,6 +24,7 @@ const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departme
       </h2>
       <form onSubmit={(e) => { e.preventDefault(); handleUserSubmit(formData, isEditing, formData.userID); }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Input Fields */}
           <input
             type="text"
             name="name"
@@ -52,19 +53,24 @@ const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departme
             <option value="Admin">Admin</option>
             <option value="User">User</option>
           </select>
-          <input
-            type={passwordVisible ? "text" : "password"}
-            name="password"
-            value={formData.password}
-            onChange={handleUserChange}
-            placeholder="Password"
-            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
-            required
-          />
-          <span onClick={togglePasswordVisibility}>
-            {passwordVisible ? <FaEyeSlash /> : <FaEye />}
-          </span>
+          <div className="relative">
+            <input
+              type={passwordVisible ? "text" : "password"}
+              name="password"
+              value={formData.password || ""}
+              onChange={handleUserChange}
+              placeholder="Password"
+              className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+            />
+            <span 
+              onClick={togglePasswordVisibility}
+              className="absolute right-2 top-1/2 transform -translate-y-1/2 cursor-pointer"
+            >
+              {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
+          {/* Other Fields */}
           <input
             type="text"
             name="address"
@@ -154,9 +160,26 @@ const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departme
 
           <input type="file" accept="image/*" className="mb-4 text-gray-700 bg-gray-100" />
         </div>
-        <button type="submit" className="w-full bg-green-500 text-white py-2 rounded">
-          {isEditing ? "Update User & Account" : "Add User & Account"}
-        </button>
+
+        {/* Flex container for buttons */}
+        <div className="flex justify-end mt-4">
+          {/* Submit button */}
+          <button 
+            type="submit" 
+            className="w-full bg-green-500 text-white py-2 rounded"
+          >
+            {isEditing ? "Update User & Account" : "Add User & Account"}
+          </button>
+
+          {/* Cancel button */}
+          <button 
+            type="button"
+            onClick={onCancel}  // Fungsi untuk cancel (reset form atau kembali)
+            className="ml-4 w-12 h-12 bg-red-600 text-white rounded-md flex items-center justify-center"
+          >
+            <FaTimes className="text-xl" />
+          </button>
+        </div>
       </form>
     </div>
   );

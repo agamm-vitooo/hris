@@ -11,12 +11,12 @@ import UserPages from "./pages/UserPages/userPages";
 import UserDetail from "./components/layout/UserDetails";
 import AboutPage from "./pages/aboutPages";
 import AccountPages from "./pages/account/accountPages";
-import AttendanceClient from "../client/pages/attendance/attendance"; // Halaman Client
-import AttendanceAdmin from "./pages/attendance/attendancePages"; // Halaman Admin
+import AttendanceAdmin from "./pages/attendance/attendanceAdmin"; // Halaman Admin
 import Dashboard from "../client/pages/dashboard";
 
 //Client
 import ProfilePage from "../client/pages/users/ProfilePage";
+import AttendanceClient from "../client/pages/attendance/attendanceClient"; // Halaman Client
 
 function App() {
   return (

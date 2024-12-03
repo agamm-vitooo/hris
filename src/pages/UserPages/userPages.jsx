@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, updatePassword } from "firebase/auth";
 import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc } from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 import UserForm from '../../components/layout/user/userForm';
@@ -82,11 +82,22 @@ const UserPages = () => {
     setLoading(true);
     try {
       if (isEditing) {
-        // Update existing user
-        await updateDoc(doc(db, "users", editingID), formData);
+        const { userID, email, password, ...userData } = formData;
+
+        // Jika password baru diberikan, perbarui password di Firebase Auth
+        if (password) {
+          const user = auth.currentUser;
+          await updatePassword(user, password); // Update password jika ada perubahan
+          toast.success("Password updated successfully!");
+        }
+
+        // Perbarui data pengguna selain password di Firestore
+        const updatedUserData = { ...userData }; // Jangan sertakan password di sini
+        await updateDoc(doc(db, "users", editingID), updatedUserData);
+
         toast.success("User updated successfully!");
       } else {
-        // Create new user and account
+        // Buat pengguna baru jika belum ada
         const { email, password, ...userData } = formData;
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
         if (user) {
@@ -96,15 +107,17 @@ const UserPages = () => {
           toast.success("Account and user added successfully!");
         }
       }
+
+      // Segarkan daftar user setelah operasi
       fetchUsers();
-      resetForm();
+      resetForm();  // Reset form setelah berhasil
     } catch (error) {
       toast.error("Failed to save user.");
       console.error("Error saving user:", error);
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   const resetForm = () => {
     setFormData(initialFormState);
@@ -127,6 +140,10 @@ const UserPages = () => {
     setFormData(user);
     setIsEditing(true);
     setEditingID(user.id);
+  };
+
+  const handleCancel = () => {
+    resetForm(); // Reset form data when cancel is clicked
   };
 
   const departmentPositions = {
@@ -153,6 +170,7 @@ const UserPages = () => {
         handleUserSubmit={handleUserSubmit}
         departmentPositions={departmentPositions}
         loading={loading}
+        onCancel={handleCancel}  // Pass onCancel to UserForm
       />
 
       <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
@@ -191,7 +209,7 @@ const UserPages = () => {
       <UserTables
         users={filteredUsers}
         handleDelete={handleDelete}
-        handleEdit={handleEdit}  // Pass handleEdit to UserTable
+        handleEdit={handleEdit}  
       />
 
       <ToastContainer />

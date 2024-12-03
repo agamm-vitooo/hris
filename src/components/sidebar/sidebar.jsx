@@ -24,7 +24,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       if (querySnapshot.empty) {
         console.log("User not found in Firestore");
         toast.error("Pengguna tidak ditemukan di database!");
-        navigate("/"); // Redirect to login if user not found
+        navigate("/"); 
         return;
       }
 
@@ -95,29 +95,43 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <nav className="mt-4">
           {/* Show Admin link only if role is 'Admin' */}
           {role === "Admin" && (
-            <Link
-              to="/UserPages"
-              className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
-            >
-              Admin Users
-            </Link>
+            <>
+              <Link
+                to="/UserPages"
+                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+              >
+                Admin Users
+              </Link>
+              {/* Admin specific Attendance link */}
+              <Link
+                to="/AttendanceAdmin"
+                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+              >
+                Attendance (Admin)
+              </Link>
+            </>
           )}
+          
           {/* Show User link only if role is 'User' */}
           {role === "User" && (
-            <Link
-              to="/ProfilePage"
-              className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
-            >
-              Client Users
-            </Link>
+            <>
+              <Link
+                to="/ProfilePage"
+                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+              >
+                Client Users
+              </Link>
+              {/* User specific Attendance link */}
+              <Link
+                to="/AttendanceClient"
+                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+              >
+                Attendance (User)
+              </Link>
+            </>
           )}
+
           {/* Common links */}
-          <Link
-            to="/attendance"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
-          >
-            Attendance
-          </Link>
           <Link
             to="/payrolls"
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
@@ -129,12 +143,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
           >
             Leave Requests
-          </Link>
-          <Link
-            to="/tasks"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
-          >
-            Tasks
           </Link>
           <Link
             to="/account"
