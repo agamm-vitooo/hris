@@ -82,9 +82,11 @@ const UserPages = () => {
     setLoading(true);
     try {
       if (isEditing) {
+        // Update existing user
         await updateDoc(doc(db, "users", editingID), formData);
         toast.success("User updated successfully!");
       } else {
+        // Create new user and account
         const { email, password, ...userData } = formData;
         const { user } = await createUserWithEmailAndPassword(auth, email, password);
         if (user) {
@@ -102,7 +104,7 @@ const UserPages = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   const resetForm = () => {
     setFormData(initialFormState);
@@ -119,6 +121,12 @@ const UserPages = () => {
       toast.error("Failed to delete user.");
       console.error("Error deleting user:", error);
     }
+  };
+
+  const handleEdit = (user) => {
+    setFormData(user);
+    setIsEditing(true);
+    setEditingID(user.id);
   };
 
   const departmentPositions = {
@@ -183,7 +191,7 @@ const UserPages = () => {
       <UserTables
         users={filteredUsers}
         handleDelete={handleDelete}
-        handleEdit={setFormData}
+        handleEdit={handleEdit}  // Pass handleEdit to UserTable
       />
 
       <ToastContainer />

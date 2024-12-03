@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { db } from "../../server/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, query, where, getDocs } from "firebase/firestore";
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [role, setRole] = useState(null);
@@ -13,42 +13,52 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const navigate = useNavigate();
   const auth = getAuth();
 
-  // Mengambil role pengguna dari Firestore
+  // Fetch user role from Firestore based on userID (uid)
   const fetchUserRole = async (userId) => {
     try {
-      console.log("Fetching user role for userId:", userId);  // Verifikasi userId yang diterima
+      console.log("Fetching user role for userId:", userId); // Debugging
       const userRef = collection(db, "users");
-      const snapshot = await getDocs(userRef);
-      const userDoc = snapshot.docs.find(doc => doc.id === userId);
+      const q = query(userRef, where("userID", "==", userId)); // Fetch user by uid
+      const querySnapshot = await getDocs(q);
 
-      if (userDoc) {
-        // Jika ditemukan, set role
-        setRole(userDoc.data().role);
-        console.log("Fetched Role:", userDoc.data().role);  // Verifikasi role yang diambil
-      } else {
-        console.log("User not found in Firestore"); // Log jika user tidak ditemukan
+      if (querySnapshot.empty) {
+        console.log("User not found in Firestore");
+        toast.error("Pengguna tidak ditemukan di database!");
+        navigate("/"); // Redirect to login if user not found
+        return;
       }
+
+      // If user found, get role from Firestore
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data();
+        setRole(userData.role); // Set role in state
+        console.log("Fetched Role:", userData.role); // Debugging
+      });
     } catch (error) {
       console.error("Error fetching user role:", error);
+      toast.error("Gagal memuat data pengguna.");
     } finally {
-      setLoading(false);  // Selesai mengambil data
+      setLoading(false); // Stop loading when done
     }
   };
 
+  // Run once when component is mounted
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
-      console.log("Authenticated user:", user);  // Verifikasi user yang sedang login
-      fetchUserRole(user.uid);  // Ambil role berdasarkan uid
+      console.log("Authenticated user:", user); // Debugging
+      fetchUserRole(user.uid); // Fetch role based on uid
     } else {
       console.log("No authenticated user found");
+      toast.error("Pengguna tidak terautentikasi.");
+      navigate("/"); // Redirect to login if not authenticated
     }
   }, [auth]);
 
-  useEffect(() => {
-    console.log("User Role:", role);  // Verifikasi nilai role yang disimpan di state
-  }, [role]);
+  // Display loading while fetching role
+  if (loading) return <div>Loading...</div>;
 
+  // Logout handler
   const handleLogout = async () => {
     try {
       await logOut();
@@ -58,8 +68,6 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       toast.error("Failed to log out: " + error.message);
     }
   };
-
-  if (loading) return <div>Loading...</div>; // Menampilkan loading jika data masih diambil
 
   return (
     <>
@@ -85,7 +93,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           </button>
         </div>
         <nav className="mt-4">
-          {/* Hanya tampilkan link untuk Admin jika role = 'Admin' */}
+          {/* Show Admin link only if role is 'Admin' */}
           {role === "Admin" && (
             <Link
               to="/UserPages"
@@ -94,7 +102,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               Admin Users
             </Link>
           )}
-          {/* Hanya tampilkan link untuk User jika role = 'User' */}
+          {/* Show User link only if role is 'User' */}
           {role === "User" && (
             <Link
               to="/ProfilePage"
@@ -103,6 +111,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
               Client Users
             </Link>
           )}
+          {/* Common links */}
           <Link
             to="/attendance"
             className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
@@ -134,7 +143,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             Account
           </Link>
         </nav>
-        {/* Tombol Logout */}
+        {/* Logout Button */}
         <div className="mt-8 flex justify-center">
           <button
             onClick={handleLogout}

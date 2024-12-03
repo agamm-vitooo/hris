@@ -42,6 +42,16 @@ const UserForm = ({ formData, setFormData, isEditing, handleUserSubmit, departme
             className="p-2 w-full border rounded text-gray-700 bg-gray-100"
             required
           />
+          <select
+            name="role"
+            value={formData.role}
+            onChange={handleUserChange}
+            className="p-2 w-full border rounded text-gray-700 bg-gray-100"
+          >
+            <option value="">Select Role</option>
+            <option value="Admin">Admin</option>
+            <option value="User">User</option>
+          </select>
           <input
             type={passwordVisible ? "text" : "password"}
             name="password"
