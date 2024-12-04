@@ -2,15 +2,19 @@ import React, { useState, useEffect } from "react";
 import { getFirestore, collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Filters from "./filter";
-import AttendanceList from "./attendanceList";
+import Filters from "./Filter";
+import AttendanceList from "./AttendanceList";
 import PDFDownload from "./PDFDownload";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"; // Import Leaflet components
+import L from "leaflet"; // Leaflet library for maps
+import 'leaflet/dist/leaflet.css'; // Import Leaflet CSS
 
 const AttendanceAdmin = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [dateFilter, setDateFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
+  const [mapCenter, setMapCenter] = useState([0, 0]); // Default map center
   const db = getFirestore();
 
   useEffect(() => {
@@ -57,6 +61,12 @@ const AttendanceAdmin = () => {
     }
 
     setFilteredData(filtered);
+
+    // Update map center based on filtered data (first user)
+    if (filtered.length > 0 && filtered[0].location) {
+      const firstUserLocation = filtered[0].location.split(", ");
+      setMapCenter([parseFloat(firstUserLocation[0].split(": ")[1]), parseFloat(firstUserLocation[1].split(": ")[1])]);
+    }
   };
 
   const handleMarkAbsent = async (id) => {
@@ -88,7 +98,7 @@ const AttendanceAdmin = () => {
       </div>
 
       {/* Attendance List Section */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto mb-6">
         <AttendanceList
           filteredData={filteredData}
           handleMarkAbsent={handleMarkAbsent}

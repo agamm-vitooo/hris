@@ -3,30 +3,41 @@ import { getFirestore, collection, addDoc, getDocs, query, where } from "firebas
 import { getAuth } from "firebase/auth";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
+import L from "leaflet";
+
+// Default coordinates for Yogyakarta
+const DEFAULT_COORDINATES = [-7.7956, 110.3695];
 
 const AttendanceClient = () => {
   const [status, setStatus] = useState(""); // Status of attendance (e.g., "Present", "Absent")
   const [date, setDate] = useState(""); // Date of attendance
   const [location, setLocation] = useState(""); // Geolocation of the user
   const [name, setName] = useState(""); // User's name
-  const [isLoading, setIsLoading] = useState(false); // State for loading
+  const [isLoading, setIsLoading] = useState(false); // Loading state for the button and form
   const db = getFirestore();
   const auth = getAuth();
 
+  // Custom component to capture user's location on the map
+  const LocationMarker = () => {
+    const map = useMapEvents({
+      click(event) {
+        const { lat, lng } = event.latlng;
+        setLocation(`Latitude: ${lat}, Longitude: ${lng}`);
+      },
+    });
+
+    return (
+      <Marker position={DEFAULT_COORDINATES}>
+        <Popup>Click on the map to set your location.</Popup>
+      </Marker>
+    );
+  };
+
   useEffect(() => {
-    // Set current date on page load
+    // Set today's date on page load
     const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
     setDate(today);
-
-    // Fetch geolocation when the component loads
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const { latitude, longitude } = position.coords;
-        setLocation(`Latitude: ${latitude}, Longitude: ${longitude}`);
-      });
-    } else {
-      toast.error("Geolocation is not supported by this browser.");
-    }
 
     // Fetch user data (name) from Firestore based on userID
     const fetchUserData = async () => {
@@ -52,7 +63,7 @@ const AttendanceClient = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [auth, db]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -68,7 +79,7 @@ const AttendanceClient = () => {
       // Create new attendance document in Firestore
       const newAttendance = {
         userID: user.uid,
-        name, // Add name to the attendance document
+        name,
         date,
         status,
         location,
@@ -78,11 +89,12 @@ const AttendanceClient = () => {
       await addDoc(collection(db, "attendance"), newAttendance);
       toast.success("Attendance marked successfully!");
       setStatus(""); // Reset status after submission
+      setLocation(""); // Reset location after submission
     } catch (error) {
       toast.error("Failed to mark attendance.");
       console.error("Error marking attendance:", error);
     } finally {
-      setIsLoading(false); // Reset loading state
+      setIsLoading(false); // Reset loading state after submission completes
     }
   };
 
@@ -142,12 +154,24 @@ const AttendanceClient = () => {
           />
         </div>
 
+        {/* Leaflet Map */}
+        <div className="h-64">
+          <MapContainer center={DEFAULT_COORDINATES} zoom={13} style={{ height: "100%", width: "100%" }}>
+            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <LocationMarker />
+          </MapContainer>
+        </div>
+
         <button
           type="submit"
           className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200"
-          disabled={isLoading || !status}
+          disabled={isLoading || !status || !location}
         >
-          {isLoading ? "Submitting..." : "Mark Attendance"}
+          {isLoading ? (
+            <span className="animate-spin">⏳</span> // Loading spinner
+          ) : (
+            "Mark Attendance"
+          )}
         </button>
       </form>
     </div>
