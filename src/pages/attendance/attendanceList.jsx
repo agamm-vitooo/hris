@@ -13,6 +13,7 @@ const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
               <th className="border-b p-2 text-left">Name</th>
               <th className="border-b p-2 text-left">Date</th>
               <th className="border-b p-2 text-left">Status</th>
+              <th className="border-b p-2 text-left">Location</th> {/* Added Location Column */}
               <th className="border-b p-2 text-left">Actions</th>
             </tr>
           </thead>
@@ -22,6 +23,7 @@ const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
                 <td className="border-b p-2">{attendance.name}</td>
                 <td className="border-b p-2">{attendance.date}</td>
                 <td className="border-b p-2">{attendance.status}</td>
+                <td className="border-b p-2">{attendance.location}</td> {/* Display Location */}
                 <td className="border-b p-2">
                   {attendance.status !== "Absent" && (
                     <button

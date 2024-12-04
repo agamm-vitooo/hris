@@ -20,9 +20,8 @@ const Login = () => {
 
         try {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user; // Firebase Authentication UID
+            const user = userCredential.user; 
             
-            // Query Firestore to find the user document with userID that matches the Firebase UID
             const q = query(collection(db, 'users'), where('userID', '==', user.uid));
             const querySnapshot = await getDocs(q);
             
