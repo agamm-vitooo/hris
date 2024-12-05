@@ -1,13 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Sidebar from "../sidebar/sidebar";
-import logo from "../../assets/icon.png"; 
+import logo from "../../assets/icon.png";
+import { getAuth } from "firebase/auth";
+import { db } from "../../server/firebase";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [role, setRole] = useState(null);  // State untuk menyimpan peran pengguna
 
   const toggleSidebar = () => {
     setIsOpen((prev) => !prev);
+  };
+
+  // Fetch user role from Firestore based on user ID
+  const fetchUserRole = async (userId) => {
+    try {
+      const userRef = collection(db, "users");
+      const q = query(userRef, where("userID", "==", userId)); // Fetch user by uid
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        toast.error("Pengguna tidak ditemukan di database!");
+        return;
+      }
+
+      querySnapshot.forEach((doc) => {
+        const userData = doc.data();
+        setRole(userData.role); // Set role in state
+      });
+    } catch (error) {
+      console.error("Error fetching user role:", error);
+      toast.error("Gagal memuat data pengguna.");
+    }
+  };
+
+  // Fetch user role when component mounts
+  useEffect(() => {
+    const user = getAuth().currentUser;
+    if (user) {
+      fetchUserRole(user.uid); // Fetch role based on uid
+    }
+  }, []);
+
+  // Set link destination based on user role
+  const getLogoLink = () => {
+    if (role === "Admin") {
+      return "/Home"; // Admin logo links to homePages
+    } else if (role === "User") {
+      return "/dashboard"; // User logo links to dashboard
+    }
+    return "/"; // Default to home if role is not set yet
   };
 
   return (
@@ -35,7 +80,7 @@ const Navbar = () => {
 
           {/* Logo and HRIS Text */}
           <Link
-            to="/home"
+            to={getLogoLink()} // Dynamically set the link based on role
             className="navLogo flex items-center text-black font-semibold text-xl"
           >
             {/* Logo Image */}

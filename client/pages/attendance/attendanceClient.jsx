@@ -89,20 +89,20 @@ const AttendanceClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
+  
     if (!date || !status || !location) {
       toast.error("All fields are required!");
       setLoading(false);
       return;
     }
-
+  
     try {
       const user = auth.currentUser;
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
       const userData = userDoc.exists() ? userDoc.data() : {};
       const userName = userData.name || user.displayName || "Anonymous";
-
+  
       const attendanceData = {
         userID: user.uid,
         name: userName,
@@ -111,10 +111,10 @@ const AttendanceClient = () => {
         location: location,
         createdAt: new Date().toISOString(),
       };
-
+  
       const attendanceCollectionRef = collection(db, "attendance");
       await addDoc(attendanceCollectionRef, attendanceData);
-
+  
       toast.success("Attendance marked successfully!");
       setDate("");
       setStatus("");
@@ -125,7 +125,7 @@ const AttendanceClient = () => {
     } finally {
       setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="container mx-auto p-6">
@@ -139,7 +139,7 @@ const AttendanceClient = () => {
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-700 bg-gray-100"
             required
           />
         </div>
@@ -149,7 +149,7 @@ const AttendanceClient = () => {
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
+            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 text-gray-700 bg-gray-100"
             required
           >
             <option value="">Select Status</option>

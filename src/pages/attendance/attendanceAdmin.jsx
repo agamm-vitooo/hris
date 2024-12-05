@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getFirestore, collection, getDocs, updateDoc, doc, getDoc } from "firebase/firestore";
+import { getFirestore, collection, getDocs, updateDoc, doc, getDoc, onSnapshot } from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Filters from "./Filter";
@@ -22,6 +22,27 @@ const AttendanceAdmin = () => {
   useEffect(() => {
     applyFilters();
   }, [dateFilter, statusFilter, attendanceData]);
+
+  useEffect(() => {
+    // Real-time listener untuk data absensi
+    const unsubscribe = onSnapshot(collection(db, "attendance"), (snapshot) => {
+      const attendanceList = snapshot.docs.map((docSnapshot) => {
+        const attendance = { id: docSnapshot.id, ...docSnapshot.data() };
+  
+        if (!attendance.userID) {
+          console.error("User ID is missing for attendance entry", attendance);
+          return null;
+        }
+  
+        return attendance;
+      }).filter(item => item !== null);
+  
+      setAttendanceData(attendanceList);
+    });
+  
+    // Cleanup listener saat komponen unmount
+    return () => unsubscribe();
+  }, [db]);  
 
   const fetchAttendanceData = async () => {
     try {

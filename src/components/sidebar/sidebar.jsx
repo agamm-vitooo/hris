@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import { logOut } from "../../server/firebaseAuth";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { db } from "../../server/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { FaUser, FaCog, FaSignOutAlt, FaUsers } from "react-icons/fa"; // Importing icons from React Icons
+import { FaUserAlt, FaUsersCog, FaSignOutAlt, FaClipboardList, FaTachometerAlt, FaBuilding } from "react-icons/fa"; // Ikon-ikon baru
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const auth = getAuth();
+  const location = useLocation(); // Get current location/path
 
   // Fetch user role from Firestore based on userID (uid)
   const fetchUserRole = async (userId) => {
@@ -70,6 +71,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     }
   };
 
+  // Function to check if current path matches the link
+  const isActiveLink = (path) => location.pathname === path;
+
   return (
     <>
       {isOpen && (
@@ -80,7 +84,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       )}
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 z-50 transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} bg-blue-600`} // bg-blue-700 applied here
+        className={`fixed top-0 left-0 h-full w-64 z-50 transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} bg-blue-600`}
       >
         <div className="p-4 text-lg font-bold bg-blue-600 relative">
           HRIS Dashboard
@@ -95,67 +99,67 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {/* Show Admin link only if role is 'Admin' */}
           {role === "Admin" && (
             <>
-              <Link
+              <NavLink
                 to="/UserPages"
-                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+                className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/UserPages") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
               >
-                <FaUsers className="mr-2" /> {/* Icon for Admin Users */}
+                <FaUsersCog className="mr-2" /> {/* Icon for Admin Users */}
                 Admin Users
-              </Link>
+              </NavLink>
               {/* Admin specific Attendance link */}
-              <Link
+              <NavLink
                 to="/AttendanceAdmin"
-                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+                className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/AttendanceAdmin") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
               >
-                <FaUser className="mr-2" /> {/* Icon for Attendance (Admin) */}
+                <FaClipboardList className="mr-2" /> {/* Icon for Attendance (Admin) */}
                 Attendance (Admin)
-              </Link>
+              </NavLink>
             </>
           )}
 
           {/* Show User link only if role is 'User' */}
           {role === "User" && (
             <>
-              <Link
+              <NavLink
                 to="/ProfilePage"
-                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+                className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/ProfilePage") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
               >
-                <FaUser className="mr-2" /> {/* Icon for Client Users */}
+                <FaUserAlt className="mr-2" /> {/* Icon for Client Users */}
                 Client Users
-              </Link>
+              </NavLink>
               {/* User specific Attendance link */}
-              <Link
+              <NavLink
                 to="/AttendanceClient"
-                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+                className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/AttendanceClient") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
               >
-                <FaUser className="mr-2" /> {/* Icon for Attendance (User) */}
+                <FaClipboardList className="mr-2" /> {/* Icon for Attendance (User) */}
                 Attendance (User)
-              </Link>
+              </NavLink>
             </>
           )}
 
           {/* Common links */}
-          <Link
+          <NavLink
             to="/payrolls"
-            className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+            className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/payrolls") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
           >
-            <FaCog className="mr-2" /> {/* Icon for Payrolls */}
+            <FaTachometerAlt className="mr-2" /> {/* Icon for Payrolls */}
             Payrolls
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/leave-requests"
-            className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+            className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/leave-requests") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
           >
-            <FaCog className="mr-2" /> {/* Icon for Leave Requests */}
+            <FaBuilding className="mr-2" /> {/* Icon for Leave Requests */}
             Leave Requests
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/account"
-            className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
+            className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/account") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
           >
-            <FaCog className="mr-2" /> {/* Icon for Account */}
+            <FaUserAlt className="mr-2" /> {/* Icon for Account */}
             Account
-          </Link>
+          </NavLink>
         </nav>
         {/* Logout Button */}
         <div className="mt-8 flex justify-center">
