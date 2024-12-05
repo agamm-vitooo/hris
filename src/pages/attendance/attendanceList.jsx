@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import PropTypes from "prop-types";
 
 const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,66 +35,71 @@ const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredData.map((attendance) => {
-              let lat = 0;
-              let lon = 0;
+            {(Array.isArray(filteredData) && filteredData.length > 0) ? (
+              filteredData.map((attendance) => {
+                let lat = 0;
+                let lon = 0;
 
-              // Check if location is a string or an object
-              if (typeof attendance.location === "string") {
-                // If location is a string, split it
-                const location = attendance.location.split(", ");
-                lat = parseFloat(location[0]) || 0;
-                lon = parseFloat(location[1]) || 0;
-              } else if (typeof attendance.location === "object" && attendance.location.lat && attendance.location.lon) {
-                // If location is an object, use lat and lon directly
-                lat = attendance.location.lat;
-                lon = attendance.location.lon;
-              }
+                // Check if location is a string or an object
+                if (typeof attendance.location === "string") {
+                  const location = attendance.location.split(", ");
+                  lat = parseFloat(location[0]) || 0;
+                  lon = parseFloat(location[1]) || 0;
+                } else if (typeof attendance.location === "object" && attendance.location.lat && attendance.location.lon) {
+                  lat = attendance.location.lat;
+                  lon = attendance.location.lon;
+                }
 
-              return (
-                <tr key={attendance.id}>
-                  <td className="border-b p-2">{attendance.name}</td>
-                  <td className="border-b p-2">{attendance.date}</td>
-                  <td className="border-b p-2">{attendance.status}</td>
-                  <td className="border-b p-2">
-                    {/* Location */}
-                    {attendance.location && (
-                      <div>
+                return (
+                  <tr key={attendance.id}>
+                    <td className="border-b p-2">{attendance.name}</td>
+                    <td className="border-b p-2">{attendance.date}</td>
+                    <td className="border-b p-2">{attendance.status}</td>
+                    <td className="border-b p-2">
+                      {attendance.location && (
+                        <div>
+                          <button
+                            onClick={() => handleOpenModal({ lat, lon })}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            View Map
+                          </button>
+                        </div>
+                      )}
+                    </td>
+                    <td className="border-b p-2">
+                      {attendance.status !== "Absent" && (
                         <button
-                          onClick={() => handleOpenModal({ lat, lon })}
-                          className="text-blue-500 hover:text-blue-700"
+                          onClick={() => handleMarkAbsent(attendance.id)}
+                          className="bg-red-500 text-white p-2 rounded"
                         >
-                          View Map
+                          Mark Absent
                         </button>
-                      </div>
-                    )}
-                  </td>
-                  <td className="border-b p-2">
-                    {attendance.status !== "Absent" && (
-                      <button
-                        onClick={() => handleMarkAbsent(attendance.id)}
-                        className="bg-red-500 text-white p-2 rounded"
-                      >
-                        Mark Absent
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-            })}
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
+            ) : (
+              <tr>
+                <td colSpan="5" className="border-b p-2 text-center text-gray-500">
+                  No attendance records found.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
 
       {/* Modal */}
-      {isModalOpen && (
+      {isModalOpen && selectedLocation && (
         <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-1/2">
             <button
               onClick={handleCloseModal}
               className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
-              &times; {/* Close button */}
+              &times;
             </button>
             <h3 className="text-lg font-medium text-gray-700 mb-4">Location on Map</h3>
             <MapContainer
@@ -111,6 +117,15 @@ const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
       )}
     </div>
   );
+};
+
+AttendanceList.propTypes = {
+  filteredData: PropTypes.array.isRequired,
+  handleMarkAbsent: PropTypes.func.isRequired,
+};
+
+AttendanceList.defaultProps = {
+  filteredData: [],
 };
 
 export default AttendanceList;

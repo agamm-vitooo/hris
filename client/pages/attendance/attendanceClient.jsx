@@ -1,20 +1,54 @@
 import React, { useState, useEffect } from "react";
 import { getAuth } from "firebase/auth";
-import { getFirestore, collection, addDoc, doc, getDoc } from "firebase/firestore"; // pastikan 'doc' diimpor di sini
+import { getFirestore, collection, addDoc, doc, getDoc } from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
+// Fungsi untuk memastikan uid dan userID sama
+const syncUidWithUserID = async (auth, db) => {
+  const user = auth.currentUser;
+  if (!user) {
+    console.error("User is not authenticated");
+    return;
+  }
+
+  const userDocRef = doc(db, "users", user.uid);
+  const userDocSnapshot = await getDoc(userDocRef);
+
+  if (!userDocSnapshot.exists()) {
+    // Jika data pengguna belum ada, buat dokumen baru
+    const userData = {
+      userID: user.uid, // Gunakan uid sebagai userID
+      name: user.displayName || "Anonymous",
+      email: user.email,
+      phone: "",
+      position: "",
+      role: "User",
+      status: "Active",
+    };
+    await addDoc(userDocRef, userData);
+    console.log("User document created with userID: ", user.uid);
+  } else {
+    // Memastikan userID sama dengan uid
+    const userData = userDocSnapshot.data();
+    if (userData.userID !== user.uid) {
+      console.log("Syncing userID with uid...");
+      await addDoc(userDocRef, { userID: user.uid }, { merge: true });
+      console.log("UserID updated to match uid");
+    }
+  }
+};
+
 const AttendanceClient = () => {
-  const [date, setDate] = useState(""); 
-  const [status, setStatus] = useState(""); 
-  const [location, setLocation] = useState(null); // Menyimpan lokasi sebagai objek { lat, lng }
+  const [date, setDate] = useState("");
+  const [status, setStatus] = useState("");
+  const [location, setLocation] = useState(null); 
   const [loading, setLoading] = useState(false);
   const auth = getAuth();
-  const db = getFirestore(); 
+  const db = getFirestore();
 
-  // Mendapatkan lokasi perangkat menggunakan Geolocation API
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -31,7 +65,10 @@ const AttendanceClient = () => {
     } else {
       toast.error("Geolocation is not supported by this browser.");
     }
-  }, []);
+
+    // Sync userID and uid when the component mounts
+    syncUidWithUserID(auth, db);
+  }, [auth, db]);
 
   const LocationMarker = () => {
     const map = useMapEvent("click", (e) => {
@@ -52,45 +89,43 @@ const AttendanceClient = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     if (!date || !status || !location) {
       toast.error("All fields are required!");
       setLoading(false);
       return;
     }
-  
+
     try {
-      // Pastikan nama pengguna diambil dari Firestore jika displayName tidak ada
       const user = auth.currentUser;
       const userDocRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userDocRef);
       const userData = userDoc.exists() ? userDoc.data() : {};
-      
-      const userName = userData.name || user.displayName || "Anonymous"; // fallback to "Anonymous" if both are undefined
-  
+      const userName = userData.name || user.displayName || "Anonymous";
+
       const attendanceData = {
         userID: user.uid,
-        name: userName,  // Gunakan nama yang diambil dari Firestore
+        name: userName,
         date: date,
         status: status,
         location: location,
         createdAt: new Date().toISOString(),
       };
-  
+
       const attendanceCollectionRef = collection(db, "attendance");
       await addDoc(attendanceCollectionRef, attendanceData);
-  
+
       toast.success("Attendance marked successfully!");
       setDate("");
       setStatus("");
-      setLocation(null); // Reset lokasi setelah submit
+      setLocation(null);
     } catch (error) {
       toast.error("Failed to mark attendance.");
       console.error("Error saving attendance:", error);
     } finally {
       setLoading(false);
     }
-  };  
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -127,7 +162,7 @@ const AttendanceClient = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700">Select Location</label>
           <MapContainer
-            center={location ? location : { lat: -6.2088, lng: 106.8456 }}  // Jika lokasi ada, gunakan lokasi tersebut
+            center={location ? location : { lat: -6.2088, lng: 106.8456 }}
             zoom={12}
             style={{ width: "100%", height: "400px" }}
           >

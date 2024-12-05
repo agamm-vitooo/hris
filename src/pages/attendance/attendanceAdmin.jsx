@@ -5,14 +5,14 @@ import "react-toastify/dist/ReactToastify.css";
 import Filters from "./Filter";
 import AttendanceList from "./AttendanceList";
 import PDFDownload from "./PDFDownload";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet"; // Import Leaflet components
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 
 const AttendanceAdmin = () => {
   const [attendanceData, setAttendanceData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [dateFilter, setDateFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
-  const [mapCenter, setMapCenter] = useState([0, 0]); // Default map center
+  const [mapCenter, setMapCenter] = useState([0, 0]);
   const db = getFirestore();
 
   useEffect(() => {
@@ -27,91 +27,72 @@ const AttendanceAdmin = () => {
     try {
       const attendanceCollection = collection(db, "attendance");
       const attendanceSnapshot = await getDocs(attendanceCollection);
-  
-      if (attendanceSnapshot.empty) {
-        console.log("No attendance data found.");
-      }
-  
+
       const attendanceList = await Promise.all(
         attendanceSnapshot.docs.map(async (docSnapshot) => {
           const attendance = { id: docSnapshot.id, ...docSnapshot.data() };
-  
+
           if (!attendance.userID) {
             console.error("User ID is missing for attendance entry", attendance);
-            return null; // Skip this entry if no userID
+            return null;
           }
-  
-          // Ambil data pengguna dari Firestore
-          const userDocRef = doc(db, "users", attendance.userID);
-          const userDoc = await getDoc(userDocRef);
-  
-          // Cek apakah dokumen pengguna ada
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            const userName = userData.name || "Unknown"; // Jika name tidak ada, fallback ke "Unknown"
-            return { ...attendance, name: userName };
+
+          const userDocRef = doc(db, "users", attendance.userID); 
+          const userDocSnapshot = await getDoc(userDocRef);
+
+          if (userDocSnapshot.exists()) {
+            const userData = userDocSnapshot.data();
+            return { ...attendance, name: userData.name || "Unknown" };
           } else {
-            console.error("User document not found for userID:", attendance.userID);
-            return { ...attendance, name: "Unknown" }; // Fallback jika tidak ada data pengguna
+            return { ...attendance, name: "Unknown" };
           }
         })
       );
-  
-      const validAttendanceList = attendanceList.filter(item => item !== null);
-  
-      if (validAttendanceList.length > 0) {
-        const sortedAttendanceList = validAttendanceList.sort((a, b) =>
-          new Date(b.date) - new Date(a.date) // Sort by date (newest first)
-        );
-        setAttendanceData(sortedAttendanceList);
-      } else {
-        console.log("Attendance data is empty.");
-      }
+
+      setAttendanceData(attendanceList.filter(item => item !== null));
     } catch (error) {
       console.error("Error fetching attendance data:", error);
       toast.error("Failed to fetch attendance data.");
     }
-  };  
+  };
 
   const applyFilters = () => {
     let filtered = attendanceData;
-
-    if (dateFilter) {
-      filtered = filtered.filter((attendance) =>
-        attendance.date.includes(dateFilter)
-      );
-    }
-
-    if (statusFilter) {
-      filtered = filtered.filter(
-        (attendance) => attendance.status === statusFilter
-      );
-    }
-
+    if (dateFilter) filtered = filtered.filter(item => item.date === dateFilter);
+    if (statusFilter) filtered = filtered.filter(item => item.status === statusFilter);
     setFilteredData(filtered);
+  };
 
-    // Update map center based on filtered data (first user's location)
-    if (filtered.length > 0 && filtered[0].location) {
-      const location = filtered[0].location;
+  const handleApprove = async (id) => {
+    try {
+      const attendanceDocRef = doc(db, "attendance", id);
+      await updateDoc(attendanceDocRef, { status: "Approved" });
+      fetchAttendanceData();
+      toast.success("Attendance approved");
+    } catch (error) {
+      toast.error("Failed to approve attendance");
+    }
+  };
 
-      if (typeof location === "string") {
-        const [lat, lng] = location.split(", ");
-        setMapCenter([parseFloat(lat), parseFloat(lng)]);
-      } else if (typeof location === "object" && location.lat && location.lng) {
-        setMapCenter([location.lat, location.lng]);
-      }
+  const handleReject = async (id) => {
+    try {
+      const attendanceDocRef = doc(db, "attendance", id);
+      await updateDoc(attendanceDocRef, { status: "Rejected" });
+      fetchAttendanceData();
+      toast.success("Attendance rejected");
+    } catch (error) {
+      toast.error("Failed to reject attendance");
     }
   };
 
   const handleMarkAbsent = async (id) => {
     try {
-      const attendanceDoc = doc(db, "attendance", id);
-      await updateDoc(attendanceDoc, { status: "Absent" });
-      toast.success("User marked as absent!");
+      const attendanceDocRef = doc(db, "attendance", id);
+      await updateDoc(attendanceDocRef, { status: "Absent" });
       fetchAttendanceData();
+      toast.success("Attendance marked as Absent");
     } catch (error) {
-      toast.error("Failed to mark user as absent.");
-      console.error("Error marking absent:", error);
+      toast.error("Failed to mark attendance as Absent");
     }
   };
 
@@ -120,22 +101,21 @@ const AttendanceAdmin = () => {
       <ToastContainer />
       <h1 className="text-2xl font-semibold text-gray-700 mb-6">Attendance Management</h1>
 
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6 sm:gap-0 mb-6">
-        <Filters
-          dateFilter={dateFilter}
-          setDateFilter={setDateFilter}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-        />
-        <PDFDownload dateFilter={dateFilter} filteredData={filteredData} />
-      </div>
+      <Filters
+        dateFilter={dateFilter}
+        setDateFilter={setDateFilter}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+      />
 
-      <div className="overflow-x-auto mb-6">
-        <AttendanceList
-          filteredData={filteredData}
-          handleMarkAbsent={handleMarkAbsent}
-        />
-      </div>
+      <AttendanceList
+        filteredData={filteredData}
+        handleMarkAbsent={handleMarkAbsent}  // Pass the function here
+        handleApprove={handleApprove}
+        handleReject={handleReject}
+      />
+
+      <PDFDownload attendanceData={filteredData} />
     </div>
   );
 };

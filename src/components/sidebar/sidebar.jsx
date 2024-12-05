@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { getAuth } from "firebase/auth";
 import { db } from "../../server/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
+import { FaUser, FaCog, FaSignOutAlt, FaUsers } from "react-icons/fa"; // Importing icons from React Icons
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const [role, setRole] = useState(null);
@@ -79,11 +80,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       )}
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-slate-100 text-black transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 w-64 z-50`}
+        className={`fixed top-0 left-0 h-full w-64 z-50 transform transition-transform duration-300 ${isOpen ? "translate-x-0" : "-translate-x-full"} bg-blue-600`} // bg-blue-700 applied here
       >
-        <div className="p-4 text-lg font-bold bg-slate-200 relative">
+        <div className="p-4 text-lg font-bold bg-blue-600 relative">
           HRIS Dashboard
           <button
             onClick={toggleSidebar}
@@ -98,34 +97,38 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
             <>
               <Link
                 to="/UserPages"
-                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
               >
+                <FaUsers className="mr-2" /> {/* Icon for Admin Users */}
                 Admin Users
               </Link>
               {/* Admin specific Attendance link */}
               <Link
                 to="/AttendanceAdmin"
-                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
               >
+                <FaUser className="mr-2" /> {/* Icon for Attendance (Admin) */}
                 Attendance (Admin)
               </Link>
             </>
           )}
-          
+
           {/* Show User link only if role is 'User' */}
           {role === "User" && (
             <>
               <Link
                 to="/ProfilePage"
-                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
               >
+                <FaUser className="mr-2" /> {/* Icon for Client Users */}
                 Client Users
               </Link>
               {/* User specific Attendance link */}
               <Link
                 to="/AttendanceClient"
-                className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+                className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
               >
+                <FaUser className="mr-2" /> {/* Icon for Attendance (User) */}
                 Attendance (User)
               </Link>
             </>
@@ -134,20 +137,23 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
           {/* Common links */}
           <Link
             to="/payrolls"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+            className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
           >
+            <FaCog className="mr-2" /> {/* Icon for Payrolls */}
             Payrolls
           </Link>
           <Link
             to="/leave-requests"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+            className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
           >
+            <FaCog className="mr-2" /> {/* Icon for Leave Requests */}
             Leave Requests
           </Link>
           <Link
             to="/account"
-            className="block py-2.5 px-4 hover:bg-blue-700 hover:text-white transition"
+            className="py-2.5 px-4 hover:bg-white hover:text-gray-800 transition flex items-center"
           >
+            <FaCog className="mr-2" /> {/* Icon for Account */}
             Account
           </Link>
         </nav>
@@ -155,8 +161,9 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
         <div className="mt-8 flex justify-center">
           <button
             onClick={handleLogout}
-            className="bg-red-500 text-white py-2.5 px-6 rounded-lg hover:bg-red-600 transition"
+            className="bg-red-500 text-white py-2.5 px-6 rounded-lg hover:bg-red-600 transition flex items-center"
           >
+            <FaSignOutAlt className="mr-2" /> {/* Icon for Logout */}
             Log Out
           </button>
         </div>
