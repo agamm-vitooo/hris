@@ -1,178 +1,153 @@
 import React, { useState, useEffect } from "react";
-import { getFirestore, collection, addDoc, getDocs, query, where } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFirestore, collection, addDoc, doc, getDoc } from "firebase/firestore"; // pastikan 'doc' diimpor di sini
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from "react-leaflet";
-import L from "leaflet";
-
-// Default coordinates for Yogyakarta
-const DEFAULT_COORDINATES = [-7.7956, 110.3695];
+import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 
 const AttendanceClient = () => {
-  const [status, setStatus] = useState(""); // Status of attendance (e.g., "Present", "Absent")
-  const [date, setDate] = useState(""); // Date of attendance
-  const [location, setLocation] = useState(""); // Geolocation of the user
-  const [name, setName] = useState(""); // User's name
-  const [isLoading, setIsLoading] = useState(false); // Loading state for the button and form
-  const db = getFirestore();
+  const [date, setDate] = useState(""); 
+  const [status, setStatus] = useState(""); 
+  const [location, setLocation] = useState(null); // Menyimpan lokasi sebagai objek { lat, lng }
+  const [loading, setLoading] = useState(false);
   const auth = getAuth();
+  const db = getFirestore(); 
 
-  // Custom component to capture user's location on the map
+  // Mendapatkan lokasi perangkat menggunakan Geolocation API
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+          setLocation({ lat, lng });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          toast.error("Failed to get location.");
+        }
+      );
+    } else {
+      toast.error("Geolocation is not supported by this browser.");
+    }
+  }, []);
+
   const LocationMarker = () => {
-    const map = useMapEvents({
-      click(event) {
-        const { lat, lng } = event.latlng;
-        setLocation(`Latitude: ${lat}, Longitude: ${lng}`);
-      },
+    const map = useMapEvent("click", (e) => {
+      const lat = e.latlng.lat;
+      const lng = e.latlng.lng;
+      setLocation({ lat, lng });
     });
 
-    return (
-      <Marker position={DEFAULT_COORDINATES}>
-        <Popup>Click on the map to set your location.</Popup>
+    return location ? (
+      <Marker position={location}>
+        <Popup>
+          Latitude: {location.lat} <br /> Longitude: {location.lng}
+        </Popup>
       </Marker>
-    );
+    ) : null;
   };
-
-  useEffect(() => {
-    // Set today's date on page load
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    setDate(today);
-
-    // Fetch user data (name) from Firestore based on userID
-    const fetchUserData = async () => {
-      try {
-        const user = auth.currentUser;
-        if (user) {
-          const userQuery = query(collection(db, "users"), where("userID", "==", user.uid));
-          const querySnapshot = await getDocs(userQuery);
-
-          if (!querySnapshot.empty) {
-            querySnapshot.forEach((doc) => {
-              const userData = doc.data();
-              setName(userData.name); // Set name from Firestore
-            });
-          } else {
-            toast.error("User not found in the database.");
-          }
-        }
-      } catch (error) {
-        toast.error("Failed to fetch user data.");
-        console.error("Error fetching user data:", error);
-      }
-    };
-
-    fetchUserData();
-  }, [auth, db]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true); // Set loading state to true while submitting
-
+    setLoading(true);
+  
+    if (!date || !status || !location) {
+      toast.error("All fields are required!");
+      setLoading(false);
+      return;
+    }
+  
     try {
+      // Pastikan nama pengguna diambil dari Firestore jika displayName tidak ada
       const user = auth.currentUser;
-      if (!user) {
-        toast.error("You must be logged in to mark attendance.");
-        return;
-      }
-
-      // Create new attendance document in Firestore
-      const newAttendance = {
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+      const userData = userDoc.exists() ? userDoc.data() : {};
+      
+      const userName = userData.name || user.displayName || "Anonymous"; // fallback to "Anonymous" if both are undefined
+  
+      const attendanceData = {
         userID: user.uid,
-        name,
-        date,
-        status,
-        location,
-        createdAt: new Date(),
+        name: userName,  // Gunakan nama yang diambil dari Firestore
+        date: date,
+        status: status,
+        location: location,
+        createdAt: new Date().toISOString(),
       };
-
-      await addDoc(collection(db, "attendance"), newAttendance);
+  
+      const attendanceCollectionRef = collection(db, "attendance");
+      await addDoc(attendanceCollectionRef, attendanceData);
+  
       toast.success("Attendance marked successfully!");
-      setStatus(""); // Reset status after submission
-      setLocation(""); // Reset location after submission
+      setDate("");
+      setStatus("");
+      setLocation(null); // Reset lokasi setelah submit
     } catch (error) {
       toast.error("Failed to mark attendance.");
-      console.error("Error marking attendance:", error);
+      console.error("Error saving attendance:", error);
     } finally {
-      setIsLoading(false); // Reset loading state after submission completes
+      setLoading(false);
     }
-  };
+  };  
 
   return (
     <div className="container mx-auto p-6">
       <ToastContainer />
-      <h1 className="text-2xl font-semibold text-gray-700 mb-6">Attendance</h1>
-
-      {/* Display user's name */}
-      <p className="text-xl font-medium mb-4">Hello, {name ? name : "Loading..."}</p>
+      <h1 className="text-2xl font-semibold text-gray-700 mb-6">Mark Attendance</h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="date" className="block text-sm font-medium text-gray-700">
-            Date
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Date</label>
           <input
             type="date"
-            id="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-            disabled={isLoading}
+            required
           />
         </div>
 
         <div>
-          <label htmlFor="status" className="block text-sm font-medium text-gray-700">
-            Status
-          </label>
+          <label className="block text-sm font-medium text-gray-700">Status</label>
           <select
-            id="status"
             value={status}
             onChange={(e) => setStatus(e.target.value)}
             className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-            disabled={isLoading}
             required
           >
             <option value="">Select Status</option>
             <option value="Present">Present</option>
             <option value="Absent">Absent</option>
-            <option value="Late">Late</option>
           </select>
         </div>
 
-        <div>
-          <label htmlFor="location" className="block text-sm font-medium text-gray-700">
-            Current Location
-          </label>
-          <input
-            type="text"
-            id="location"
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400"
-            disabled
-          />
-        </div>
-
         {/* Leaflet Map */}
-        <div className="h-64">
-          <MapContainer center={DEFAULT_COORDINATES} zoom={13} style={{ height: "100%", width: "100%" }}>
-            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Select Location</label>
+          <MapContainer
+            center={location ? location : { lat: -6.2088, lng: 106.8456 }}  // Jika lokasi ada, gunakan lokasi tersebut
+            zoom={12}
+            style={{ width: "100%", height: "400px" }}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
             <LocationMarker />
           </MapContainer>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200"
-          disabled={isLoading || !status || !location}
-        >
-          {isLoading ? (
-            <span className="animate-spin">⏳</span> // Loading spinner
-          ) : (
-            "Mark Attendance"
-          )}
-        </button>
+        <div>
+          <button
+            type="submit"
+            className="w-full bg-green-600 text-white p-3 rounded-lg font-semibold hover:bg-green-700 transition duration-200"
+            disabled={loading}
+          >
+            {loading ? "Submitting..." : "Mark Attendance"}
+          </button>
+        </div>
       </form>
     </div>
   );

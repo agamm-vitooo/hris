@@ -15,7 +15,7 @@ const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
     setSelectedLocation(null);
   };
 
-  const defaultCoordinates = [0, 0]; // Default coordinates if location is empty
+  const defaultCoordinates = [0, 0];
 
   return (
     <div className="bg-white p-4 sm:p-6 rounded-lg shadow-md mb-6">
@@ -35,11 +35,20 @@ const AttendanceList = ({ filteredData, handleMarkAbsent }) => {
           </thead>
           <tbody>
             {filteredData.map((attendance) => {
-              const location = attendance.location
-                ? attendance.location.split(",") // Extract latitude and longitude
-                : [];
-              const lat = parseFloat(location[0]) || 0; // Set latitude
-              const lon = parseFloat(location[1]) || 0; // Set longitude
+              let lat = 0;
+              let lon = 0;
+
+              // Check if location is a string or an object
+              if (typeof attendance.location === "string") {
+                // If location is a string, split it
+                const location = attendance.location.split(", ");
+                lat = parseFloat(location[0]) || 0;
+                lon = parseFloat(location[1]) || 0;
+              } else if (typeof attendance.location === "object" && attendance.location.lat && attendance.location.lon) {
+                // If location is an object, use lat and lon directly
+                lat = attendance.location.lat;
+                lon = attendance.location.lon;
+              }
 
               return (
                 <tr key={attendance.id}>
