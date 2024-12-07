@@ -58,7 +58,7 @@ const AttendanceForm = ({ date, setDate, status, setStatus, location, setLocatio
         disabled={isLoading || !status || !location}
       >
         {isLoading ? (
-          <span className="animate-spin">⏳</span> // Loading spinner
+          <span className="animate-spin">⏳</span> 
         ) : (
           "Mark Attendance"
         )}

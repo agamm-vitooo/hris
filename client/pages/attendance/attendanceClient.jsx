@@ -20,7 +20,7 @@ const syncUidWithUserID = async (auth, db) => {
   if (!userDocSnapshot.exists()) {
     // Jika data pengguna belum ada, buat dokumen baru
     const userData = {
-      userID: user.uid, // Gunakan uid sebagai userID
+      userID: user.uid, 
       name: user.displayName || "Anonymous",
       email: user.email,
       phone: "",
@@ -31,7 +31,6 @@ const syncUidWithUserID = async (auth, db) => {
     await addDoc(userDocRef, userData);
     console.log("User document created with userID: ", user.uid);
   } else {
-    // Memastikan userID sama dengan uid
     const userData = userDocSnapshot.data();
     if (userData.userID !== user.uid) {
       console.log("Syncing userID with uid...");
@@ -66,7 +65,6 @@ const AttendanceClient = () => {
       toast.error("Geolocation is not supported by this browser.");
     }
 
-    // Sync userID and uid when the component mounts
     syncUidWithUserID(auth, db);
   }, [auth, db]);
 
