@@ -70,19 +70,18 @@ const fetchAllPayrolls = async () => {
     fetchAllPayrolls();
   }, []);
 
-  // Fetch payrolls based on selected user
   useEffect(() => {
     const fetchUserPayrolls = async () => {
       if (selectedUser) {
         try {
           const payrollRef = collection(db, 'payrolls');
-          const q = query(payrollRef, where("userID", "==", selectedUser.id)); // Query based on selected user ID
+          const q = query(payrollRef, where("userID", "==", selectedUser.id));
           const querySnapshot = await getDocs(q);
           const payrollList = [];
           querySnapshot.forEach((doc) => {
             payrollList.push({ id: doc.id, ...doc.data() });
           });
-          setUserPayrolls(payrollList); // Save payroll data specific to the selected user
+          setUserPayrolls(payrollList);
         } catch (error) {
           console.error('Error fetching user payrolls:', error);
           toast.error('Failed to load payrolls for selected user!');
@@ -90,7 +89,7 @@ const fetchAllPayrolls = async () => {
       }
     };
     fetchUserPayrolls();
-  }, [selectedUser]); // Re-run when selectedUser changes
+  }, [selectedUser]); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,11 +99,9 @@ const fetchAllPayrolls = async () => {
       return;
     }
 
-    // Calculate total allowances and deductions
     const totalAllowance = parseFloat(transportAllowance) + parseFloat(mealAllowance) + parseFloat(healthAllowance) + parseFloat(housingAllowance);
     const totalDeductions = parseFloat(incomeTax) + parseFloat(socialSecurity) + parseFloat(loanDeductions);
 
-    // Prepare payroll data
     const payrollData = {
       userID: selectedUser.id,
       basicSalary: parseFloat(basicSalary),
@@ -121,13 +118,11 @@ const fetchAllPayrolls = async () => {
       createdAt: new Date(),
     };
 
-    // Save payroll data to Firestore (in a collection 'payrolls')
     try {
       const payrollRef = collection(db, 'payrolls');
       await addDoc(payrollRef, payrollData);
       toast.success('Payroll data saved successfully!');
 
-      // Reset form after submission
       setBasicSalary('');
       setTransportAllowance('');
       setMealAllowance('');
@@ -147,7 +142,6 @@ const fetchAllPayrolls = async () => {
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-primary">Payrolls Admin</h1>
 
-      {/* Select user for payroll */}
       <div className="mb-4">
         <label className="block text-lg mb-2 text-primary">Select User</label>
         <select
@@ -167,7 +161,6 @@ const fetchAllPayrolls = async () => {
         </select>
       </div>
 
-     {/* Daftar Payrolls yang sudah ada */}
 {!selectedUser && payrolls.length > 0 && (
   <div className="mb-4">
     <h3 className="text-xl font-semibold text-primary mb-2">All Payrolls</h3>
@@ -187,13 +180,12 @@ const fetchAllPayrolls = async () => {
   </div>
 )}
 
-      {/* Payrolls list for selected user */}
 {selectedUser && userPayrolls.length > 0 && (
   <div className="mb-4">
     <h3 className="text-xl font-semibold text-primary mb-2">Payrolls for {selectedUser.name}</h3>
     <ul className="space-y-2">
       {userPayrolls.map((payroll) => (
-        <li key={payroll.id} className="bg-gray-100 p-4 rounded-lg border border-gray-300">
+        <li key={payroll.id} className="bg-gray-100 p-4 rounded-lg border border-gray-300 text-primary">
           <div><strong>Nama User:</strong> {selectedUser.name}</div> {/* Nama Pengguna */}
           <div><strong>Basic Salary:</strong> {payroll.basicSalary}</div>
           <div><strong>Total Allowances:</strong> {payroll.totalAllowance}</div>
@@ -206,7 +198,6 @@ const fetchAllPayrolls = async () => {
   </div>
 )}
 
-      {/* Payroll form */}
       {selectedUser && (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

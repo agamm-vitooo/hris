@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../../src/server/firebase'; // Import instance Firestore
+import { db } from '../../../src/server/firebase';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { toast } from 'react-toastify';
 
 const PayrollsClient = ({ userID }) => {
-  const [userPayrolls, setUserPayrolls] = useState([]); // Payrolls for the logged-in user
-  const [userName, setUserName] = useState(''); // Store user name
-  const [loading, setLoading] = useState(true); // Loading state
+  const [userPayrolls, setUserPayrolls] = useState([]); 
+  const [userName, setUserName] = useState('');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch payrolls for the selected user (userID)
