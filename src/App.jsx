@@ -11,12 +11,14 @@ import UserPages from "./pages/UserPages/userPages";
 import UserDetail from "./components/layout/UserDetails";
 import AboutPage from "./pages/aboutPages";
 import AccountPages from "./pages/account/accountPages";
-import AttendanceAdmin from "./pages/attendance/attendanceAdmin"; // Halaman Admin
+import AttendanceAdmin from "./pages/attendance/attendanceAdmin";
 import Dashboard from "../client/pages/dashboard";
+import PayrollsAdmin from "./pages/payrolls/payrollsAdmin";
 
 //Client
 import ProfilePage from "../client/pages/users/ProfilePage";
-import AttendanceClient from "../client/pages/attendance/attendanceClient"; // Halaman Client
+import AttendanceClient from "../client/pages/attendance/attendanceClient";
+import PayrollsClient from "../client/pages/payrolls/payrollsClient";
 
 function App() {
   return (
@@ -118,6 +120,23 @@ const AppContent = () => {
               <ProfilePage />
             </ProtectedRoute>
           }
+        />
+
+        <Route
+        path="/payrollsAdmin"
+        element={
+          <ProtectedRoute>
+            <PayrollsAdmin/>
+          </ProtectedRoute>
+        }
+        />
+        <Route
+        path="/payrollsClient"
+        element={
+          <ProtectedRoute>
+            <PayrollsClient/>
+          </ProtectedRoute>
+        }
         />
       </Routes>
     </>

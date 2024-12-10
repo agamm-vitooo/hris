@@ -114,6 +114,14 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <FaClipboardList className="mr-2" /> {/* Icon for Attendance (Admin) */}
                 Attendance (Admin)
               </NavLink>
+              {/* Admin Payroll link */}
+              <NavLink
+                to="/PayrollsAdmin"
+                className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/payrollsAdmin") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
+              >
+                <FaTachometerAlt className="mr-2" /> {/* Icon for Payrolls (Admin) */}
+                Payrolls (Admin)
+              </NavLink>
             </>
           )}
 
@@ -135,17 +143,18 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 <FaClipboardList className="mr-2" /> {/* Icon for Attendance (User) */}
                 Attendance (User)
               </NavLink>
+              {/* User Payroll link */}
+              <NavLink
+                to="/PayrollsClient"
+                className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/payrollsClient") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
+              >
+                <FaTachometerAlt className="mr-2" /> {/* Icon for Payrolls (Client) */}
+                Payrolls (Client)
+              </NavLink>
             </>
           )}
 
           {/* Common links */}
-          <NavLink
-            to="/payrolls"
-            className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/payrolls") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}
-          >
-            <FaTachometerAlt className="mr-2" /> {/* Icon for Payrolls */}
-            Payrolls
-          </NavLink>
           <NavLink
             to="/leave-requests"
             className={`py-2.5 px-4 transition flex items-center ${isActiveLink("/leave-requests") ? "bg-white text-gray-800" : "hover:bg-white hover:text-gray-800"}`}

@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import { MapContainer, TileLayer, Marker, Popup, useMapEvent } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
-// Fungsi untuk memastikan uid dan userID sama
 const syncUidWithUserID = async (auth, db) => {
   const user = auth.currentUser;
   if (!user) {
