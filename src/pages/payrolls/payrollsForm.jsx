@@ -1,51 +1,74 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-const PayrollForm = ({ payrollData, setPayrollData, handlePayrollSubmit, handleDeletePayroll }) => {
+const PayrollsForm = ({ user, onClose, onSave }) => {
+  const [gajiPokok, setGajiPokok] = useState('');
+  const [tunjangan, setTunjangan] = useState('');
+  const [potongan, setPotongan] = useState('');
+
+  // Mengatur form saat modal dibuka untuk pengguna yang dipilih
+  useEffect(() => {
+    if (user) {
+      setGajiPokok(user.gajiPokok || '');
+      setTunjangan(user.tunjangan || '');
+      setPotongan(user.potongan || '');
+    }
+  }, [user]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const updatedUser = {
+      ...user,
+      gajiPokok,
+      tunjangan,
+      potongan,
+    };
+    onSave(updatedUser);  // Kirimkan data ke parent untuk menyimpan perubahan
+    onClose();  // Tutup modal setelah disimpan
+  };
+
   return (
-    <div className="mt-6">
-      <h3 className="text-xl font-semibold text-primary">Edit Payroll</h3>
-      <form onSubmit={handlePayrollSubmit}>
-        <div className="mb-4">
-          <label className="block text-lg mb-2 text-primary">Basic Salary</label>
-          <input
-            type="number"
-            className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-primary"
-            value={payrollData.basicSalary}
-            onChange={(e) => setPayrollData({ ...payrollData, basicSalary: e.target.value })}
-          />
-        </div>
-
-        {/* Form untuk kolom lainnya (tunjangan, pajak, dll) */}
-        <div className="mb-4">
-          <label className="block text-lg mb-2 text-primary">Transport Allowance</label>
-          <input
-            type="number"
-            className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-primary"
-            value={payrollData.transportAllowance}
-            onChange={(e) => setPayrollData({ ...payrollData, transportAllowance: e.target.value })}
-          />
-        </div>
-
-        {/* Input tambahan lainnya... */}
-
-        <div className="flex justify-between">
-          <button
-            type="submit"
-            className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
-          >
-            Update Payroll
-          </button>
-          <button
-            type="button"
-            onClick={handleDeletePayroll}
-            className="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700"
-          >
-            Delete Payroll
-          </button>
-        </div>
-      </form>
+    <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full sm:max-w-md lg:max-w-lg">
+        <h2 className="text-xl font-semibold mb-4 text-center">Edit Payroll Information</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="mb-4">
+            <label htmlFor="gajiPokok" className="block text-sm font-medium text-gray-700">Gaji Pokok</label>
+            <input
+              type="number"
+              id="gajiPokok"
+              value={gajiPokok}
+              onChange={(e) => setGajiPokok(e.target.value)}
+              className="mt-1 bg-gray-100 text-primary block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="tunjangan" className="block text-sm font-medium text-gray-700">Tunjangan</label>
+            <input
+              type="number"
+              id="tunjangan"
+              value={tunjangan}
+              onChange={(e) => setTunjangan(e.target.value)}
+              className="mt-1 block bg-gray-100 text-primary w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="mb-4">
+            <label htmlFor="potongan" className="block text-sm font-medium text-gray-700">Potongan</label>
+            <input
+              type="number"
+              id="potongan"
+              value={potongan}
+              onChange={(e) => setPotongan(e.target.value)}
+              className="mt-1 block bg-gray-100 text-primary w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+            />
+          </div>
+          <div className="flex justify-end">
+            <button type="button" onClick={onClose} className="mr-2 bg-gray-400 text-white px-4 py-2 rounded-md">Cancel</button>
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Save</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
 
-export default PayrollForm;
+export default PayrollsForm;
