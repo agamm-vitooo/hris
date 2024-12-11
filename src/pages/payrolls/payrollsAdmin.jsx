@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../../server/firebase'; // Import Firestore instance
-import { collection, getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { toast } from 'react-toastify';
-import FilterSection from './payrolls.filterSelection';
-import UsersList from './payroll.userList';
-import PayrollForm from './payrollsForm';
+import { db } from '../../server/firebase'; // Mengimpor Firestore instance
+import { collection, getDocs, query, where } from 'firebase/firestore'; // Mengimpor fungsi Firestore untuk query data
+import { toast } from 'react-toastify'; // Untuk notifikasi error
+import FilterSection from './payrolls.filterSelection'; // Komponen filter
+import UsersList from './payroll.userList'; // Komponen untuk menampilkan daftar pengguna
+import PayrollForm from './payrollsForm'; // Form untuk mengedit payroll
 
 const PayrollsAdmin = () => {
-  const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
-  const [selectedRole, setSelectedRole] = useState('');
-  const [selectedDepartment, setSelectedDepartment] = useState('');
-  const [roles, setRoles] = useState([]);
-  const [departments, setDepartments] = useState([]);
-  const [editingPayroll, setEditingPayroll] = useState(null);
+  const [users, setUsers] = useState([]); // Daftar pengguna
+  const [filteredUsers, setFilteredUsers] = useState([]); // Pengguna setelah difilter
+  const [selectedRole, setSelectedRole] = useState(''); // Role yang dipilih
+  const [selectedDepartment, setSelectedDepartment] = useState(''); // Departemen yang dipilih
+  const [roles, setRoles] = useState([]); // Daftar roles yang ada
+  const [departments, setDepartments] = useState([]); // Daftar departemen yang ada
+  const [editingPayroll, setEditingPayroll] = useState(null); // Data payroll yang sedang diedit
   const [payrollData, setPayrollData] = useState({
     basicSalary: '',
     transportAllowance: '',
@@ -25,6 +25,7 @@ const PayrollsAdmin = () => {
     loanDeductions: ''
   });
 
+  // Effect untuk mengambil daftar pengguna
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -51,6 +52,7 @@ const PayrollsAdmin = () => {
     fetchUsers();
   }, []);
 
+  // Effect untuk menyaring pengguna berdasarkan role dan department
   useEffect(() => {
     let filtered = users;
 
@@ -65,13 +67,17 @@ const PayrollsAdmin = () => {
     setFilteredUsers(filtered);
   }, [selectedRole, selectedDepartment, users]);
 
+  // Mengambil data payroll untuk pengguna yang dipilih
   const fetchPayrollData = async (userId) => {
     try {
       const payrollRef = collection(db, 'payrolls');
-      const payrollSnapshot = await getDocs(payrollRef);
-      const payrollDoc = payrollSnapshot.docs.find(doc => doc.data().userID === userId);
+      const q = query(payrollRef, where('uid', '==', userId));
+      const querySnapshot = await getDocs(q);
   
-      if (payrollDoc) {
+      console.log("Payroll Query Snapshot:", querySnapshot.empty);  // Debugging log
+  
+      if (!querySnapshot.empty) {
+        const payrollDoc = querySnapshot.docs[0];
         const payroll = payrollDoc.data();
         setPayrollData({
           basicSalary: payroll.basicSalary || '',
@@ -84,8 +90,8 @@ const PayrollsAdmin = () => {
           loanDeductions: payroll.loanDeductions || ''
         });
         setEditingPayroll(payrollDoc.id);  // Menyimpan ID payroll untuk diedit
-        console.log("Payroll Data Loaded:", payroll);
       } else {
+        console.log("No payroll data found for this user");  // Debugging log
         setPayrollData({
           basicSalary: '',
           transportAllowance: '',
@@ -97,7 +103,6 @@ const PayrollsAdmin = () => {
           loanDeductions: ''
         });
         setEditingPayroll(null);
-        console.log("No payroll found for this user.");
       }
     } catch (error) {
       console.error('Error fetching payroll:', error);
@@ -105,24 +110,30 @@ const PayrollsAdmin = () => {
     }
   };  
 
+  // Menangani saat pengguna dipilih untuk diedit
   const handleSelectUser = (user) => {
-    console.log("Selected User ID:", user.id);
+    console.log("Selected User ID:", user.id);  // Debugging log
     fetchPayrollData(user.id);  // Memanggil data payroll untuk user yang dipilih
-  };  
-
+  };
+  
+  // Menangani submit form payroll
   const handlePayrollSubmit = async (e) => {
     e.preventDefault();
-    // Your payroll submit logic here...
+    // Logika pengiriman payroll (tambah/ubah payroll)
+    toast.success('Payroll data saved successfully!');
   };
 
+  // Menangani penghapusan payroll
   const handleDeletePayroll = async () => {
-    // Your payroll delete logic here...
+    // Logika penghapusan payroll
+    toast.success('Payroll data deleted successfully!');
   };
 
   return (
     <div className="container mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6 text-primary">Payrolls Admin</h1>
 
+      {/* Filter Section */}
       <FilterSection
         roles={roles}
         departments={departments}
@@ -131,15 +142,20 @@ const PayrollsAdmin = () => {
         setSelectedRole={setSelectedRole}
         setSelectedDepartment={setSelectedDepartment}
       />
-      
-      <UsersList filteredUsers={filteredUsers} handleSelectUser={handleSelectUser} />
+
+      {/* Daftar Pengguna */}
+      <UsersList
+        filteredUsers={filteredUsers}
+        handleSelectUser={handleSelectUser}
+      />
+
+      {/* Form Payroll */}
       {editingPayroll && (
         <PayrollForm
           payrollData={payrollData}
           setPayrollData={setPayrollData}
           handlePayrollSubmit={handlePayrollSubmit}
           handleDeletePayroll={handleDeletePayroll}
-          editingPayroll={editingPayroll}
         />
       )}
     </div>

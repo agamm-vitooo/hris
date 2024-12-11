@@ -20,12 +20,15 @@ const UsersList = ({ filteredUsers, handleSelectUser }) => {
               <td className="py-2 px-4 border">{user.role}</td>
               <td className="py-2 px-4 border">{user.department}</td>
               <td className="py-2 px-4 border">
-                <button
-                  onClick={() => handleSelectUser(user)}
-                  className="bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700"
-                >
-                  Edit Payroll
-                </button>
+              <button
+                onClick={() => {
+                  console.log("Edit button clicked for", user.name);
+                  handleSelectUser(user);
+                }}
+                className="bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700"
+              >
+                Edit Payroll
+              </button>
               </td>
             </tr>
           ))}

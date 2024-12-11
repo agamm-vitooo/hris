@@ -1,6 +1,6 @@
 import React from 'react';
 
-const PayrollForm = ({ payrollData, setPayrollData, handlePayrollSubmit, handleDeletePayroll, editingPayroll }) => {
+const PayrollForm = ({ payrollData, setPayrollData, handlePayrollSubmit, handleDeletePayroll }) => {
   return (
     <div className="mt-6">
       <h3 className="text-xl font-semibold text-primary">Edit Payroll</h3>
@@ -15,15 +15,25 @@ const PayrollForm = ({ payrollData, setPayrollData, handlePayrollSubmit, handleD
           />
         </div>
 
-        <h3 className="text-lg font-semibold mb-2 text-primary">Tunjangan</h3>
-        {/* Add more inputs for allowances, deductions, etc. */}
-        
+        {/* Form untuk kolom lainnya (tunjangan, pajak, dll) */}
+        <div className="mb-4">
+          <label className="block text-lg mb-2 text-primary">Transport Allowance</label>
+          <input
+            type="number"
+            className="w-full p-2 border border-gray-300 rounded bg-gray-100 text-primary"
+            value={payrollData.transportAllowance}
+            onChange={(e) => setPayrollData({ ...payrollData, transportAllowance: e.target.value })}
+          />
+        </div>
+
+        {/* Input tambahan lainnya... */}
+
         <div className="flex justify-between">
           <button
             type="submit"
             className="bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700"
           >
-            {editingPayroll ? 'Update Payroll' : 'Save Payroll'}
+            Update Payroll
           </button>
           <button
             type="button"
